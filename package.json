@@ -12,7 +12,9 @@
     "typecheck": "tsc --noEmit",
     "test": "tsx --test scripts/*.test.ts",
     "contrast": "tsx scripts/contrast-check.ts",
-    "seal-contact-form": "tsx scripts/seal-contact-form.ts"
+    "seal-contact-form": "tsx scripts/seal-contact-form.ts",
+    "set-slug": "node scripts/set-slug.mjs",
+    "add-pair": "node scripts/add-pair.mjs"
   },
   "dependencies": {
     "next": "14.2.35",

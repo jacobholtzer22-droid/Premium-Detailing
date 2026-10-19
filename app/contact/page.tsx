@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import ContactDetails from '@/components/ContactDetails'
-import ContactForm from '@/components/ContactForm'
+import ContactFormGate from '@/components/ContactFormGate'
 import CoverageList from '@/components/CoverageList'
 import JsonLd from '@/components/JsonLd'
 import NextSteps from '@/components/NextSteps'
@@ -30,7 +30,7 @@ export default async function ContactPage() {
       <div className="mx-auto grid max-w-page gap-10 px-4 pt-10 sm:px-6 lg:grid-cols-3">
         <div className="lg:col-span-2">
           <article className="mb-8">{content}</article>
-          <ContactForm />
+          <ContactFormGate />
         </div>
         <aside>
           <ContactDetails />
