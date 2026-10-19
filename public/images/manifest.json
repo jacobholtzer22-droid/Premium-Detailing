@@ -10,6 +10,37 @@
       1920
     ]
   },
+  "black-acura-nsx-parking-lot.jpg": {
+    "width": 1800,
+    "height": 2400,
+    "alt": "Black Acura NSX sports car parked in a lot, pop up headlights and polished paint under blue sky",
+    "base": "black-acura-nsx-parking-lot",
+    "sizes": [
+      640,
+      1024
+    ]
+  },
+  "black-bmw-m2-wet-driveway.jpg": {
+    "width": 2400,
+    "height": 2112,
+    "alt": "Black BMW M2 coupe on a wet concrete driveway, carbon front splitter and black wheels gleaming",
+    "base": "black-bmw-m2-wet-driveway",
+    "sizes": [
+      640,
+      1024,
+      1920
+    ]
+  },
+  "black-bmw-x5-paver-driveway.jpg": {
+    "width": 1800,
+    "height": 2400,
+    "alt": "Black BMW X5 on a paver driveway beside a tile roofed house, palms reflected along the flank",
+    "base": "black-bmw-x5-paver-driveway",
+    "sizes": [
+      640,
+      1024
+    ]
+  },
   "black-bmw-x6-finished-on-pavers.jpg": {
     "width": 4032,
     "height": 2269,
@@ -19,6 +50,26 @@
       640,
       1024,
       1920
+    ]
+  },
+  "black-bmw-x6-m-outside-shop.jpg": {
+    "width": 1800,
+    "height": 2400,
+    "alt": "Black BMW X6 M outside the shop with the branded detailing van parked alongside it",
+    "base": "black-bmw-x6-m-outside-shop",
+    "sizes": [
+      640,
+      1024
+    ]
+  },
+  "black-corvette-c8-side-profile-shop.jpg": {
+    "width": 1800,
+    "height": 2400,
+    "alt": "Black Chevrolet Corvette in profile outside the shop, mirror finish down the door and rear fender",
+    "base": "black-corvette-c8-side-profile-shop",
+    "sizes": [
+      640,
+      1024
     ]
   },
   "black-infiniti-q50-gloss-front.jpg": {
@@ -74,6 +125,16 @@
       1920
     ]
   },
+  "black-porsche-macan-shop-hex-lights.jpg": {
+    "width": 1800,
+    "height": 2400,
+    "alt": "Black Porsche Macan inside the shop under hexagon LED lighting reflected across the hood and roof",
+    "base": "black-porsche-macan-shop-hex-lights",
+    "sizes": [
+      640,
+      1024
+    ]
+  },
   "black-ram-truck-garage-hex-lights.jpg": {
     "width": 1191,
     "height": 1588,
@@ -115,6 +176,26 @@
       640
     ]
   },
+  "blue-cadillac-escalade-esv-front-quarter.jpg": {
+    "width": 1800,
+    "height": 2400,
+    "alt": "Blue long wheelbase Cadillac Escalade front quarter under oaks outside the shop after a detail",
+    "base": "blue-cadillac-escalade-esv-front-quarter",
+    "sizes": [
+      640,
+      1024
+    ]
+  },
+  "blue-cadillac-escalade-front-detail.jpg": {
+    "width": 1800,
+    "height": 2400,
+    "alt": "Close front corner of a blue Cadillac Escalade, black mesh grille and vertical light bar polished",
+    "base": "blue-cadillac-escalade-front-detail",
+    "sizes": [
+      640,
+      1024
+    ]
+  },
   "blue-lancer-evo-front-quarter.jpg": {
     "width": 720,
     "height": 960,
@@ -135,6 +216,16 @@
       1920
     ]
   },
+  "bmw-m2-cs-gold-wheels-shop-hex-lights.jpg": {
+    "width": 1800,
+    "height": 2400,
+    "alt": "Grey BMW M2 with gold wheels inside the shop under hexagon LED lighting on a flake floor",
+    "base": "bmw-m2-cs-gold-wheels-shop-hex-lights",
+    "sizes": [
+      640,
+      1024
+    ]
+  },
   "bmw-m4-foam-wash-mobile-van.jpg": {
     "width": 3025,
     "height": 3024,
@@ -144,6 +235,37 @@
       640,
       1024,
       1920
+    ]
+  },
+  "bmw-x5-wheel-red-caliper-close.jpg": {
+    "width": 1800,
+    "height": 2400,
+    "alt": "Close view of a BMW X5 front wheel and red brake caliper against clean grey bodywork",
+    "base": "bmw-x5-wheel-red-caliper-close",
+    "sizes": [
+      640,
+      1024
+    ]
+  },
+  "chevrolet-ssr-two-tone-paver-driveway.jpg": {
+    "width": 2400,
+    "height": 2048,
+    "alt": "Black and silver Chevrolet SSR convertible pickup on a brick paver driveway beside a garage",
+    "base": "chevrolet-ssr-two-tone-paver-driveway",
+    "sizes": [
+      640,
+      1024,
+      1920
+    ]
+  },
+  "class-c-motorhome-outside-shop.jpg": {
+    "width": 1800,
+    "height": 2400,
+    "alt": "White Class C motorhome on a Ford chassis parked on the lot outside the shop after a wash",
+    "base": "class-c-motorhome-outside-shop",
+    "sizes": [
+      640,
+      1024
     ]
   },
   "detail-brush-cleaning-red-door-panel.jpg": {
@@ -166,6 +288,67 @@
       640
     ]
   },
+  "ford-super-duty-wheel-mud-tire.jpg": {
+    "width": 1800,
+    "height": 2400,
+    "alt": "Black wheel and chunky all terrain tire on a grey Ford Super Duty pickup, dressed and shining",
+    "base": "ford-super-duty-wheel-mud-tire",
+    "sizes": [
+      640,
+      1024
+    ]
+  },
+  "gold-lamborghini-urus-driveway-wash.jpg": {
+    "width": 2400,
+    "height": 1800,
+    "alt": "Gold Lamborghini Urus being washed on a paver driveway with a green Huracan parked behind it",
+    "base": "gold-lamborghini-urus-driveway-wash",
+    "sizes": [
+      640,
+      1024,
+      1920
+    ]
+  },
+  "gold-lamborghini-urus-rear-quarter.jpg": {
+    "width": 1800,
+    "height": 2400,
+    "alt": "Rear quarter of a gold Lamborghini Urus on pavers, carbon diffuser and black wheel still wet",
+    "base": "gold-lamborghini-urus-rear-quarter",
+    "sizes": [
+      640,
+      1024
+    ]
+  },
+  "green-chevrolet-tahoe-front-quarter.jpg": {
+    "width": 1800,
+    "height": 2400,
+    "alt": "Green Chevrolet Tahoe front quarter under oak trees, chrome grille and paint freshly polished",
+    "base": "green-chevrolet-tahoe-front-quarter",
+    "sizes": [
+      640,
+      1024
+    ]
+  },
+  "green-chevrolet-tahoe-outside-shop.jpg": {
+    "width": 1800,
+    "height": 2400,
+    "alt": "Green Chevrolet Tahoe parked outside the shop front with its glass windows and open bay door",
+    "base": "green-chevrolet-tahoe-outside-shop",
+    "sizes": [
+      640,
+      1024
+    ]
+  },
+  "green-lexus-rx-front-quarter-shop.jpg": {
+    "width": 1800,
+    "height": 2400,
+    "alt": "Green Lexus RX front quarter outside the shop with the branded detailing van parked behind it",
+    "base": "green-lexus-rx-front-quarter-shop",
+    "sizes": [
+      640,
+      1024
+    ]
+  },
   "grey-bmw-3-series-front-driveway.jpg": {
     "width": 3024,
     "height": 4032,
@@ -177,6 +360,46 @@
       1920
     ]
   },
+  "grey-bmw-x5-front-quarter-shop.jpg": {
+    "width": 1800,
+    "height": 2400,
+    "alt": "Grey BMW X5 parked under oak trees outside the shop, front grille and paint freshly finished",
+    "base": "grey-bmw-x5-front-quarter-shop",
+    "sizes": [
+      640,
+      1024
+    ]
+  },
+  "grey-corvette-c8-convertible-driveway.jpg": {
+    "width": 1800,
+    "height": 2400,
+    "alt": "Grey Chevrolet Corvette convertible with the roof panels off, parked on a driveway under palms",
+    "base": "grey-corvette-c8-convertible-driveway",
+    "sizes": [
+      640,
+      1024
+    ]
+  },
+  "grey-porsche-panamera-front-quarter.jpg": {
+    "width": 1800,
+    "height": 2400,
+    "alt": "Grey Porsche Panamera front quarter in front of a row of white roller doors on a clear morning",
+    "base": "grey-porsche-panamera-front-quarter",
+    "sizes": [
+      640,
+      1024
+    ]
+  },
+  "harley-road-glide-blue-driveway.jpg": {
+    "width": 1800,
+    "height": 2400,
+    "alt": "Blue and silver Harley Davidson Road Glide on a driveway with the branded detailing van behind",
+    "base": "harley-road-glide-blue-driveway",
+    "sizes": [
+      640,
+      1024
+    ]
+  },
   "hot-water-extraction-cloth-seat.jpg": {
     "width": 2160,
     "height": 3840,
@@ -186,6 +409,26 @@
       640,
       1024,
       1920
+    ]
+  },
+  "mercedes-amg-gle-red-leather-interior.jpg": {
+    "width": 1800,
+    "height": 2400,
+    "alt": "Red and black Mercedes AMG interior through the open driver door, dash and seat freshly cleaned",
+    "base": "mercedes-amg-gle-red-leather-interior",
+    "sizes": [
+      640,
+      1024
+    ]
+  },
+  "mercedes-gle-cargo-area-cleaned.jpg": {
+    "width": 1800,
+    "height": 2400,
+    "alt": "Open rear cargo area of a white Mercedes SUV, carpet vacuumed and trim wiped down after a detail",
+    "base": "mercedes-gle-cargo-area-cleaned",
+    "sizes": [
+      640,
+      1024
     ]
   },
   "orange-lamborghini-huracan-driveway.jpg": {
@@ -226,6 +469,26 @@
       1920
     ]
   },
+  "red-bmw-x3-m50-outside-shop.jpg": {
+    "width": 1800,
+    "height": 2400,
+    "alt": "Red metallic BMW X3 outside the shop, flake in the paint catching the sun along the hood and door",
+    "base": "red-bmw-x3-m50-outside-shop",
+    "sizes": [
+      640,
+      1024
+    ]
+  },
+  "red-ferrari-308-open-hood-carport.jpg": {
+    "width": 1800,
+    "height": 2400,
+    "alt": "Red classic Ferrari with the hood and engine lid raised under a carport, wet floor beneath it",
+    "base": "red-ferrari-308-open-hood-carport",
+    "sizes": [
+      640,
+      1024
+    ]
+  },
   "red-ferrari-foam-wash-bay.jpg": {
     "width": 639,
     "height": 1480,
@@ -233,6 +496,16 @@
     "base": "red-ferrari-foam-wash-bay",
     "sizes": [
       639
+    ]
+  },
+  "red-mercedes-maybach-gls-driveway.jpg": {
+    "width": 1800,
+    "height": 2400,
+    "alt": "Red Mercedes Maybach SUV on a paver driveway with chrome wheels and a palm overhanging it",
+    "base": "red-mercedes-maybach-gls-driveway",
+    "sizes": [
+      640,
+      1024
     ]
   },
   "red-motorcycle-fender-gloss.jpg": {
@@ -257,6 +530,16 @@
       1920
     ]
   },
+  "satin-black-audi-rs6-hood-open.jpg": {
+    "width": 1800,
+    "height": 2400,
+    "alt": "Satin black Audi RS6 Avant on a driveway with the hood raised over the engine bay after a detail",
+    "base": "satin-black-audi-rs6-hood-open",
+    "sizes": [
+      640,
+      1024
+    ]
+  },
   "silver-coupe-garage-hex-lights.jpg": {
     "width": 2900,
     "height": 1597,
@@ -266,6 +549,16 @@
       640,
       1024,
       1920
+    ]
+  },
+  "silver-tesla-model-x-driveway.jpg": {
+    "width": 1800,
+    "height": 2400,
+    "alt": "Silver Tesla Model X on a damp driveway with palms and a house behind it after a mobile detail",
+    "base": "silver-tesla-model-x-driveway",
+    "sizes": [
+      640,
+      1024
     ]
   },
   "vw-wheel-cleaned-on-pavers.jpg": {
@@ -312,6 +605,26 @@
       1920
     ]
   },
+  "white-bmw-x7-m-sport-street.jpg": {
+    "width": 1800,
+    "height": 2400,
+    "alt": "White BMW X7 on a quiet residential street, paint and black grille finished under a blue sky",
+    "base": "white-bmw-x7-m-sport-street",
+    "sizes": [
+      640,
+      1024
+    ]
+  },
+  "white-cadillac-escalade-front-quarter.jpg": {
+    "width": 1800,
+    "height": 2400,
+    "alt": "White Cadillac Escalade front quarter on a concrete drive beside a stone wall and tile roof",
+    "base": "white-cadillac-escalade-front-quarter",
+    "sizes": [
+      640,
+      1024
+    ]
+  },
   "white-camry-driveway-palms.jpg": {
     "width": 765,
     "height": 1020,
@@ -326,6 +639,16 @@
     "height": 723,
     "alt": "White Lamborghini Huracan with red wheels parked on a driveway beside a fence at dusk",
     "base": "white-lamborghini-red-wheels-driveway",
+    "sizes": [
+      640,
+      1024
+    ]
+  },
+  "white-mercedes-amg-gle-outside-shop.jpg": {
+    "width": 1800,
+    "height": 2400,
+    "alt": "White Mercedes AMG SUV outside the shop at golden hour, black wheels and grille against the paint",
+    "base": "white-mercedes-amg-gle-outside-shop",
     "sizes": [
       640,
       1024
@@ -351,6 +674,16 @@
       640,
       1024,
       1920
+    ]
+  },
+  "white-volvo-ex30-paver-driveway.jpg": {
+    "width": 1800,
+    "height": 2400,
+    "alt": "White Volvo electric crossover on a paver driveway with the branded detailing van behind it",
+    "base": "white-volvo-ex30-paver-driveway",
+    "sizes": [
+      640,
+      1024
     ]
   }
 }

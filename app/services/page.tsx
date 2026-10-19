@@ -3,6 +3,7 @@ import CtaBand from '@/components/CtaBand'
 import JsonLd from '@/components/JsonLd'
 import PageHeader from '@/components/PageHeader'
 import ServiceGrid from '@/components/ServiceGrid'
+import ServicePills from '@/components/ServicePills'
 import { config } from '@/lib/config'
 import { loadContent, readFrontmatter } from '@/lib/content'
 import { breadcrumbList } from '@/lib/schema'
@@ -25,7 +26,11 @@ export default async function ServicesIndexPage() {
     <>
       <JsonLd data={breadcrumbList(CRUMBS)} />
       <PageHeader title={`Services in ${config.primaryCity}, ${config.primaryState}`} crumbs={CRUMBS} />
-      <article className="mx-auto max-w-3xl px-4 pt-6 sm:px-6">{content}</article>
+      {/* The pills come first, before the prose: somebody who already knows
+          the words "window tinting" should not have to read a paragraph to
+          find out we do it. */}
+      <ServicePills />
+      <article className="mx-auto max-w-3xl px-4 pt-10 sm:px-6">{content}</article>
       <ServiceGrid heading="Everything We Offer" />
       <CtaBand />
     </>

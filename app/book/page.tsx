@@ -8,7 +8,7 @@ import { config, formatPrice } from '@/lib/config'
 import { buildMetadata } from '@/lib/seo'
 
 const DESCRIPTION =
-  'Pick a detailing package and book a time, or request a quote for ceramic coating, paint protection film and window tint on the Treasure Coast.'
+  'Pick a detailing package and book a time, or request a quote for ceramic coating, paint protection film, paint correction and window tinting.'
 
 export const metadata: Metadata = buildMetadata({
   kind: 'other',
@@ -20,15 +20,63 @@ export const metadata: Metadata = buildMetadata({
 /**
  * The booking page.
  *
- * This is the ONE place on the site that renders a dollar sign, and the figure
- * comes from config.services[].priceFrom. No price is ever typed into content.
+ * This is the ONE place on the site that renders a dollar sign for every
+ * service at once, and every figure comes from config: either a service's
+ * priceFrom or a tier's. No price is ever typed into content.
  *
- * A service with a bookingUrl gets a real booking button. A service marked
- * comingSoon gets a muted pill and a quote CTA instead, because sending
- * somebody to a calendar for something that cannot be booked yet is worse
- * than telling them it is coming.
+ * The cards are FLATTENED: a service sold as a price ladder contributes one
+ * card per package rather than one card for the service, because somebody on
+ * this page has already decided to buy and is choosing between Bronze, Silver
+ * and Gold, not between "mobile detailing" and "tint".
+ *
+ * A card with a calendar gets a booking button. Everything quoted per vehicle
+ * gets a quote button, because sending somebody to a calendar for work that
+ * cannot be priced until it is seen wastes their time and ours.
  */
+interface Card {
+  key: string
+  name: string
+  href: string
+  priceFrom: number | null
+  priceNote: string | null
+  blurb: string
+  bookingUrl: string | null
+  /** A tier of a larger service, which is what makes it a "package". */
+  isTier: boolean
+}
+
+function cards(): Card[] {
+  return config.services.flatMap<Card>((s) => {
+    if (s.tiers.length > 0) {
+      return s.tiers.map((t) => ({
+        key: `${s.slug}-${t.slug}`,
+        name: t.name,
+        href: `/services/${s.slug}#${t.anchor}`,
+        priceFrom: t.priceFrom,
+        priceNote: t.priceNote,
+        blurb: t.includes.join('. ') + '.',
+        bookingUrl: t.bookingUrl,
+        isTier: true,
+      }))
+    }
+    return [
+      {
+        key: s.slug,
+        name: s.name,
+        href: `/services/${s.slug}`,
+        priceFrom: s.priceFrom,
+        priceNote: s.priceNote,
+        blurb: s.shortDescription,
+        bookingUrl: s.bookingUrl,
+        isTier: false,
+      },
+    ]
+  })
+}
+
 export default function BookPage() {
+  const items = cards()
+
   return (
     <>
       <section className="bg-primary-dark text-on-primary">
@@ -39,49 +87,42 @@ export default function BookPage() {
           </p>
           <h1 className="font-heading text-hero font-extrabold">Book a Detail</h1>
           <p className="mt-5 max-w-2xl text-lg text-on-primary/85">
-            Pick the package that fits your vehicle and grab a time. The detailing packages come to you, and every
-            starting price below is confirmed once we see the size and condition of the vehicle.
+            The detailing packages come to you and can be booked straight from here. Coating, film, correction and tint
+            are done at the shop and quoted per vehicle, so those take a quote request instead.
           </p>
         </div>
       </section>
 
       <section className="mx-auto max-w-page px-4 py-16 sm:px-6 md:py-24">
         <ul className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-          {config.services.map((s, i) => (
-            <li key={s.slug}>
-              <Reveal delay={Math.min((i % 3) * 60, 360)}>
+          {items.map((c, i) => (
+            <li key={c.key} className="flex">
+              <Reveal delay={Math.min((i % 3) * 60, 360)} className="w-full">
                 <div className="lift flex h-full flex-col rounded-site border border-line bg-surface p-6 shadow-site">
-                  <div className="flex items-start justify-between gap-3">
-                    <h2 className="font-heading text-xl font-bold text-primary-dark">
-                      <Link href={`/services/${s.slug}`} className="hover:text-accent">
-                        {s.name}
-                      </Link>
-                    </h2>
-                    {s.comingSoon && (
-                      <span className="flex-shrink-0 rounded-full bg-primary-soft px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-muted">
-                        Coming soon
-                      </span>
-                    )}
-                  </div>
+                  <h2 className="font-heading text-xl font-bold text-primary-dark">
+                    <Link href={c.href} className="hover:text-accent">
+                      {c.name}
+                    </Link>
+                  </h2>
 
-                  {s.priceFrom !== null && (
+                  {c.priceFrom !== null && (
                     <p className="mt-4 font-heading text-3xl font-extrabold tabular-nums text-primary-dark">
-                      From ${formatPrice(s.priceFrom)}
+                      From ${formatPrice(c.priceFrom)}
                     </p>
                   )}
-                  {s.priceNote && <p className="mt-1 text-sm text-muted">{s.priceNote}</p>}
+                  {c.priceNote && <p className="mt-1 text-sm text-muted">{c.priceNote}</p>}
 
-                  <p className="mt-4 flex-1 text-base leading-relaxed text-ink">{s.shortDescription}</p>
+                  <p className="mt-4 flex-1 text-base leading-relaxed text-ink">{c.blurb}</p>
 
                   <div className="mt-6">
-                    {s.bookingUrl && !s.comingSoon ? (
+                    {c.bookingUrl ? (
                       <a
-                        href={s.bookingUrl}
+                        href={c.bookingUrl}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="btn inline-block rounded-site bg-accent px-5 py-3 text-sm font-semibold text-on-accent hover:bg-accent-dark"
                       >
-                        Book this package
+                        {c.isTier ? 'Book this package' : 'Book this service'}
                       </a>
                     ) : (
                       <Link

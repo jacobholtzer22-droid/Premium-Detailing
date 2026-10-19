@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import AreaList from '@/components/AreaList'
 import BeforeAfter from '@/components/BeforeAfter'
+import CarStrip from '@/components/CarStrip'
 import CtaBand from '@/components/CtaBand'
 import FaqAccordion from '@/components/FaqAccordion'
 import Gallery from '@/components/Gallery'
@@ -35,6 +36,9 @@ export default async function HomePage() {
       <JsonLd data={faqPage(config.faqs)} />
 
       <Hero />
+      {/* His own cars, straight after the hero: the fastest way to answer
+          "what do these people actually turn out" is to show it. */}
+      <CarStrip />
       {/* The lead statement, with the three figures beside it at lg so the
           right half is not empty. The numbers appear once on the page: the
           full width strip that used to sit under How it works is gone. */}

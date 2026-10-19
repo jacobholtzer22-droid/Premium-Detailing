@@ -169,6 +169,26 @@
   .ba-fade {
     transition: opacity 200ms ease;
   }
+
+  /* The moving car strip. The track holds the list twice, so translating it
+     by exactly half its width lands the second copy where the first began and
+     the loop has no seam. Pauses for a pointer and for keyboard focus. */
+  .carstrip-track {
+    animation: carstrip 70s linear infinite;
+    will-change: transform;
+  }
+  @keyframes carstrip {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+  .carstrip:hover .carstrip-track,
+  .carstrip:focus-within .carstrip-track {
+    animation-play-state: paused;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -207,5 +227,22 @@
   }
   .tile::after {
     transform: scaleX(0) !important;
+  }
+  /* The strip stops being a marquee and becomes a plain scrollable row. The
+     duplicate half exists only to make the loop seamless, so it goes: with
+     nothing moving it would just show every car twice. */
+  .carstrip {
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+  }
+  .carstrip-track {
+    animation: none !important;
+    width: max-content;
+  }
+  .carstrip-dupe {
+    display: none !important;
+  }
+  .carstrip-tile {
+    scroll-snap-align: start;
   }
 }

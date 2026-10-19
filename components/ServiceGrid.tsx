@@ -30,8 +30,8 @@ export default function ServiceGrid({ heading = 'Our Services', exclude }: Props
         </Reveal>
         <ul className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {services.map((s, i) => (
-            <li key={s.slug}>
-              <Reveal delay={Math.min((i % 3) * 60, 360)}>
+            <li key={s.slug} className="flex">
+              <Reveal delay={Math.min((i % 3) * 60, 360)} className="w-full">
                 <Link
                   href={`/services/${s.slug}`}
                   className="lift group flex h-full flex-col overflow-hidden rounded-site border border-line bg-surface shadow-site"
@@ -46,20 +46,13 @@ export default function ServiceGrid({ heading = 'Our Services', exclude }: Props
                     </div>
                   )}
                   <div className="flex flex-1 flex-col p-6">
-                    <div className="flex items-start justify-between gap-3">
-                      <h3 className="font-heading text-xl font-bold text-primary-dark group-hover:text-accent">
-                        {s.name}
-                      </h3>
-                      {s.comingSoon && (
-                        <span className="mt-0.5 flex-shrink-0 rounded-full bg-primary-soft px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-muted">
-                          Soon
-                        </span>
-                      )}
-                    </div>
+                    <h3 className="font-heading text-xl font-bold text-primary-dark group-hover:text-accent">
+                      {s.name}
+                    </h3>
                     <p className="mt-3 flex-1 text-base leading-relaxed text-muted">{s.shortDescription}</p>
                     <div className="mt-5 flex items-baseline justify-between gap-3 border-t border-line pt-4">
                       <span className="text-sm font-semibold tabular-nums text-ink">
-                        {s.priceFrom !== null ? `From $${formatPrice(s.priceFrom)}` : 'Quoted on site'}
+                        {s.priceFrom !== null ? `From $${formatPrice(s.priceFrom)}` : 'Quoted after an evaluation'}
                       </span>
                       <span className="text-sm font-semibold text-accent">Learn more</span>
                     </div>

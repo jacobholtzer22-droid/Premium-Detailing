@@ -6,7 +6,7 @@ import theme from '@/theme'
 import HeroVideo from './HeroVideo'
 import Img from './Img'
 import Phone from './Phone'
-import TrustChips from './TrustChips'
+import HeroChecks from './HeroChecks'
 
 /**
  * Homepage hero. Owns the page's single <h1>. Layout comes from
@@ -67,7 +67,7 @@ export default function Hero() {
           </p>
           {cta(true)}
           <div className="hero-rise" style={rise(360)}>
-            <TrustChips className="mt-10" />
+            <HeroChecks className="mt-10" />
           </div>
         </div>
       </section>
@@ -82,7 +82,7 @@ export default function Hero() {
           <h1 className="mt-4 font-heading text-hero font-extrabold text-primary-dark">{h1}</h1>
           <p className="mt-6 max-w-xl text-lg text-muted md:text-xl">{config.tagline}</p>
           {cta(false)}
-          <TrustChips className="mt-10" />
+          <HeroChecks className="mt-10" />
         </div>
         {hero && (
           <div className="overflow-hidden rounded-site shadow-site md:col-span-2">

@@ -105,7 +105,11 @@ export function localBusiness(areas: readonly ServiceArea[] = config.serviceArea
     })),
     areaServed: areaServed(areas),
     ...whenNonEmpty(sameAs(c), (urls) => ({ sameAs: urls })),
-    ...when(c.yearsInBusiness, (years) => ({ foundingDate: String(new Date().getFullYear() - years) })),
+    // foundingYear when it is known, because the yearsInBusiness fallback
+    // moves the founding date forward every January.
+    ...when(c.foundingYear ?? (c.yearsInBusiness === null ? null : new Date().getFullYear() - c.yearsInBusiness), (year) => ({
+      foundingDate: String(year),
+    })),
     ...aggregateRating(c),
     hasOfferCatalog: {
       '@type': 'OfferCatalog',

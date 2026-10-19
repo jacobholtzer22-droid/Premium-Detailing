@@ -7,6 +7,9 @@ import type { SiteConfigInput } from '@/lib/config-schema'
  * Anything the brief left UNKNOWN is null or an empty array here, and the
  * block that depends on it does not render. An empty slot is correct; a
  * plausible guess is a defect.
+ *
+ * Facts marked [owner] came from Chris in writing on 2026-10-19 and outrank
+ * anything read off the old site.
  */
 const config: SiteConfigInput = {
   // PLACEHOLDER. Swap for the real platform slug at launch, then redeploy.
@@ -15,7 +18,8 @@ const config: SiteConfigInput = {
 
   legalName: 'Premium Detailing',
   displayName: 'Premium Detailing',
-  tagline: 'Mobile detailing, ceramic coating and paint correction on the Treasure Coast. We come to your driveway.',
+  tagline:
+    'Mobile detailing at your driveway, plus ceramic coating, paint protection film, paint correction and window tinting at the shop. Serving the Treasure Coast.',
 
   // AutomotiveBusiness is the real schema.org type for a detailer.
   // "AutoDetailing" is not a schema.org type and must never be used.
@@ -24,6 +28,9 @@ const config: SiteConfigInput = {
   phone: '+17723020717',
   email: 'premiumdetailingpsl@gmail.com',
 
+  // The published Google Business Profile address. The shop address is a
+  // separate, still-unanswered question on the client follow-up list; nothing
+  // on the site names a shop address until he gives one.
   address: {
     street: '864 SW Piedmont Ct',
     city: 'Port St. Lucie',
@@ -34,121 +41,110 @@ const config: SiteConfigInput = {
   },
 
   // Drives the homepage and area H1s. Without it the template would use
-  // services[0].name and headline the site "Bronze Package".
+  // services[0].name, which is now "Mobile Detailing" anyway, but leaving it
+  // explicit keeps the H1 stable if the service order ever changes again.
   tradeName: 'Mobile Detailing',
 
   primaryCity: 'Port St. Lucie',
   primaryState: 'FL',
 
+  // [owner] "Serving the Treasure Coast", in his order. Port St. Lucie is the
+  // primary city and is not repeated here; AreaList renders it first and
+  // points it at the homepage.
   serviceAreas: [
-    { slug: 'fort-pierce', name: 'Fort Pierce', county: 'St. Lucie County' },
     { slug: 'stuart', name: 'Stuart', county: 'Martin County' },
     { slug: 'palm-city', name: 'Palm City', county: 'Martin County' },
     { slug: 'jensen-beach', name: 'Jensen Beach', county: 'Martin County' },
+    { slug: 'sewalls-point', name: "Sewall's Point", county: 'Martin County' },
+    { slug: 'jupiter', name: 'Jupiter', county: 'Palm Beach County' },
+    { slug: 'fort-pierce', name: 'Fort Pierce', county: 'St. Lucie County' },
     { slug: 'vero-beach', name: 'Vero Beach', county: 'Indian River County' },
   ],
 
+  // [owner] Five services, all live. The three detailing packages are tiers of
+  // one service, not three services: as separate entries the price ladder was
+  // taking three of the six cards on every grid and headlining the site.
   services: [
     {
-      slug: 'bronze-package',
-      name: 'Bronze Package',
+      slug: 'mobile-detailing',
+      name: 'Mobile Detailing',
       shortDescription:
-        'Our entry level detail: exterior wash, tire shine, vacuum and a full wipe down, done at your home.',
+        'Three packages that come to your driveway, from a maintenance wash to a full detail inside and out with our own protection blend.',
       priceFrom: 125,
-      priceNote: 'Starting price; final quote depends on vehicle size and condition.',
-      bookingUrl: 'https://api.leadconnectorhq.com/widget/booking/KfMx0UuW6ZhHpIRgeqLe',
+      priceNote: 'Starting price for the Bronze Package; the final quote depends on vehicle size and condition.',
+      // The tiers carry the calendars. The service itself is not one bookable
+      // thing, so it has no single booking URL.
+      bookingUrl: null,
       comingSoon: false,
-      image: 'vw-wheel-cleaned-on-pavers.jpg',
+      image: 'black-bmw-x6-finished-on-pavers.jpg',
+      tiers: [
+        {
+          name: 'Bronze Package',
+          slug: 'bronze',
+          anchor: 'bronze',
+          priceFrom: 125,
+          priceNote: 'Starting price; final quote depends on vehicle size and condition.',
+          includes: [
+            'Exterior hand wash',
+            'Tire shine',
+            'Interior vacuum',
+            'Full interior wipe down',
+          ],
+          bookingUrl: 'https://api.leadconnectorhq.com/widget/booking/KfMx0UuW6ZhHpIRgeqLe',
+        },
+        {
+          name: 'Silver Package',
+          slug: 'silver',
+          anchor: 'silver',
+          priceFrom: 225,
+          priceNote: 'Starting price; final quote depends on vehicle size and condition.',
+          includes: [
+            'Everything in the Bronze Package',
+            'Exterior wax over the paint',
+            'Light interior detail',
+          ],
+          bookingUrl: 'https://api.leadconnectorhq.com/widget/booking/K4lPRLc5picjsYtGzs39',
+        },
+        {
+          name: 'Gold Package',
+          slug: 'gold',
+          anchor: 'gold',
+          priceFrom: 325,
+          priceNote: 'Starting price; final quote depends on vehicle size and condition.',
+          includes: [
+            'Everything in the Bronze and Silver Packages',
+            'Full exterior detail, paint detailed meticulously',
+            'Full interior detail with seat shampoo and pet hair removal',
+            'Odor removal',
+            'Our protection blend, at least forty-five days',
+          ],
+          bookingUrl: 'https://api.leadconnectorhq.com/widget/booking/5EXJwsToTNOyza8OKOB0',
+        },
+      ],
       faqs: [
         {
-          q: 'Do you come to me for a Bronze Package?',
-          a: 'Yes. The detailing packages are mobile, so we come to your driveway in Port St. Lucie or anywhere else on the Treasure Coast and work on the vehicle where it sits.',
+          q: 'Do you come to me for a detailing package?',
+          a: 'Yes. The Bronze, Silver and Gold packages are mobile, so we come to your driveway in Port St. Lucie or anywhere else on the Treasure Coast and work on the vehicle where it sits.',
         },
         {
-          q: 'What is actually included?',
-          a: 'An exterior wash, tire shine, an interior vacuum and a wipe down. It is built to keep a car that is already in decent shape looking sharp, not to recover a neglected one.',
+          q: 'Which package should I pick?',
+          a: 'Bronze maintains a car that is already relatively clean. Silver adds an exterior wax and a light interior detail. Gold is the full job inside and out, finished with a protection blend that holds for at least forty-five days.',
         },
         {
-          q: 'How long does a Bronze Package take?',
-          a: 'It depends on the size and condition of the vehicle, so we confirm the time window with you when you book rather than quoting a number that may not hold.',
+          q: 'Can you get out pet hair, stains and sand?',
+          a: 'Yes, and that is the Gold Package. It covers seat shampoo, pet hair and the sand that gets into everything down here, and odor removal is part of the job.',
+        },
+        {
+          q: 'Can you add a clay bar or an engine detail?',
+          a: 'Yes. A clay bar treatment, an engine detail and a seat shampoo can all be added to any package. Ask for what you want when you book and it will be quoted alongside the rest of the job.',
+        },
+        {
+          q: 'How long does a package take?',
+          a: 'It depends on the size and condition of the vehicle, and Gold takes considerably longer than Bronze. We confirm the time window with you when you book rather than quoting a number that may not hold.',
         },
         {
           q: 'How often should I book one?',
           a: 'As a general rule, a maintenance wash and vacuum about once a month keeps dirt and salt from building up. How often you need it depends on where the car is parked and how far you drive.',
-        },
-        {
-          q: 'Should I book Bronze or Silver?',
-          a: 'Bronze maintains a car that is already relatively clean. If you want the paint to look its best rather than just clean, the Silver Package adds an exterior wax and a light interior detail.',
-        },
-        {
-          q: 'Do I need to provide anything?',
-          a: 'Tell us where the vehicle will be parked when you book and we will confirm what we need from you on site, including access to water or power if that applies.',
-        },
-      ],
-    },
-    {
-      slug: 'silver-package',
-      name: 'Silver Package',
-      shortDescription:
-        'Everything in Bronze plus an exterior wax and a light interior detail, for paint that looks its best.',
-      priceFrom: 225,
-      priceNote: 'Starting price; final quote depends on vehicle size and condition.',
-      bookingUrl: 'https://api.leadconnectorhq.com/widget/booking/K4lPRLc5picjsYtGzs39',
-      comingSoon: false,
-      image: 'black-bmw-x6-finished-on-pavers.jpg',
-      faqs: [
-        {
-          q: 'What does the Silver Package add over Bronze?',
-          a: 'Everything in the Bronze Package, plus an exterior wax and a light interior detail. It is aimed at the person who wants the outside of the car to look perfect.',
-        },
-        {
-          q: 'Is the full interior included?',
-          a: 'The interior work in Silver is light: a vacuum and a wipe down. If the inside needs a deep clean, seat shampoo or odor removal, that is the Gold Package.',
-        },
-        {
-          q: 'Can you add a clay bar?',
-          a: 'Yes, a clay bar treatment can be added to a Silver Package. Ask for it when you book and we will quote it with the rest of the job.',
-        },
-        {
-          q: 'How long does the wax last?',
-          a: 'A wax is a short-term layer measured in weeks, and Florida sun and rain shorten it. If you want protection that lasts, a ceramic coating is the right conversation.',
-        },
-        {
-          q: 'Do you come to my house for this?',
-          a: 'Yes. The packages are mobile. We bring the equipment to you and work on the vehicle at your home or wherever it is parked.',
-        },
-      ],
-    },
-    {
-      slug: 'gold-package',
-      name: 'Gold Package',
-      shortDescription:
-        'The full detail inside and out, finished with a protection blend that holds for at least forty-five days.',
-      priceFrom: 325,
-      priceNote: 'Starting price; final quote depends on vehicle size and condition.',
-      bookingUrl: 'https://api.leadconnectorhq.com/widget/booking/5EXJwsToTNOyza8OKOB0',
-      comingSoon: false,
-      image: 'porsche-cayenne-red-leather-interior.jpg',
-      faqs: [
-        {
-          q: 'What makes the Gold Package different?',
-          a: 'It includes everything in Bronze and Silver, then adds a full exterior detail and a full interior detail that reaches the parts of a car most cleans never touch. The paint is detailed meticulously.',
-        },
-        {
-          q: 'Can you get out pet hair, stains and sand?',
-          a: 'Yes. The Gold Package covers seat shampoo, pet hair and the sand that gets into everything down here, and odor removal is part of the job.',
-        },
-        {
-          q: 'How long does the protection last?',
-          a: 'We finish with our own protection blend that holds for at least forty-five days. It is a protection blend, not a ceramic coating, so it is topped up rather than cured on.',
-        },
-        {
-          q: 'Should I book Gold or Silver?',
-          a: 'Silver focuses on the exterior with a light interior refresh. Choose Gold when the inside needs real work, or when you want the whole car brought back rather than maintained.',
-        },
-        {
-          q: 'How long does a Gold Package take?',
-          a: 'Longer than the other two packages, and it varies a lot with the condition of the interior. We confirm the time window with you when the appointment is booked.',
         },
       ],
     },
@@ -156,20 +152,24 @@ const config: SiteConfigInput = {
       slug: 'ceramic-coating',
       name: 'Ceramic Coating',
       shortDescription:
-        'Paint correction to take swirl marks and scratches out, then a durable ceramic coating for gloss and protection.',
+        'A durable coating that adds gloss, resists chemicals and makes a car far easier to wash, with packages running up to five years.',
       priceFrom: 750,
-      priceNote: 'Starting price for the coating; paint correction is quoted after a paint evaluation.',
+      priceNote: 'Starting price for the coating; paint correction is quoted separately after a paint evaluation.',
       bookingUrl: 'https://api.leadconnectorhq.com/widget/booking/bY1BbL4jeSiarEogmqIz',
       comingSoon: false,
-      image: 'black-mercedes-cls-gloss-front-quarter.jpg',
+      image: 'black-porsche-macan-shop-hex-lights.jpg',
       faqs: [
         {
           q: 'How long does a ceramic coating last?',
           a: 'It depends on the package. Coating packages run up to five years, and we will tell you at the paint evaluation which one suits the car and how you use it.',
         },
         {
+          q: 'Where is the coating done?',
+          a: 'At the shop in Port St. Lucie. A coating needs controlled conditions and proper lighting to be applied and inspected properly, which is why it is not one of the mobile services.',
+        },
+        {
           q: 'Do I need paint correction first?',
-          a: 'We start every job with a paint evaluation. A coating locks in whatever is underneath it, so swirl marks and scratches are polished out first when the paint needs it.',
+          a: 'We start every job with a paint evaluation. A coating locks in whatever is underneath it, so swirl marks and scratches are polished out first when the paint needs it. That is quoted separately.',
         },
         {
           q: 'Can I still wash the car normally?',
@@ -180,10 +180,6 @@ const config: SiteConfigInput = {
           a: 'No. A coating adds gloss, chemical resistance and much easier cleaning, but it is thin. Stopping chips from road debris is what paint protection film is for.',
         },
         {
-          q: 'What does the process look like?',
-          a: 'Four steps: a paint evaluation, paint correction and polishing, the ceramic coating itself, then a final detail and inspection before the car goes back to you.',
-        },
-        {
           q: 'Can you coat the interior and the tires too?',
           a: 'Yes, interior and tire coatings are available alongside the paint coating. Ask when you book and they will be quoted with the rest of the work.',
         },
@@ -192,17 +188,24 @@ const config: SiteConfigInput = {
     {
       slug: 'paint-protection-film',
       name: 'Paint Protection Film',
+      // [owner] writes it with the acronym. The acronym rides on the pills and
+      // the hero list only; titles, schema and breadcrumbs use `name`.
+      displayLabel: 'Paint Protection Film (PPF)',
       shortDescription:
         'A nearly invisible self healing film that takes the rock chips, scratches and road debris instead of your paint.',
-      priceFrom: 3999,
+      // [owner] 2026-10-19. Was 3999 from the old site.
+      priceFrom: 2999,
       priceNote: 'Starting price; the final quote depends on how much of the vehicle is covered.',
+      // No calendar for film yet: it is quoted per vehicle after we see how
+      // much coverage you want. Whether it gets its own calendar is an open
+      // question on the client follow-up list.
       bookingUrl: null,
-      comingSoon: true,
+      comingSoon: false,
       image: 'black-ram-truck-garage-hex-lights.jpg',
       faqs: [
         {
-          q: 'Can I book paint protection film right now?',
-          a: 'Not yet. Film is coming soon, so send a quote request instead of booking and we will come back to you with options and timing as soon as it is available.',
+          q: 'Where is paint protection film fitted?',
+          a: 'At the shop in Port St. Lucie. Film has to be cut, laid and squeegeed in clean, controlled conditions, so it is not something that happens on a driveway.',
         },
         {
           q: 'Should I get film or a ceramic coating?',
@@ -223,19 +226,54 @@ const config: SiteConfigInput = {
       ],
     },
     {
+      slug: 'paint-correction',
+      name: 'Paint Correction',
+      shortDescription:
+        'Machine polishing that takes swirl marks, light scratches and oxidation out of the paint before anything is sealed over it.',
+      // Correction is quoted against what the paint actually needs, so there
+      // is no starting figure. A number here would be invented.
+      priceFrom: null,
+      priceNote: 'Quoted after a paint evaluation.',
+      bookingUrl: null,
+      comingSoon: false,
+      image: 'black-mercedes-cls-gloss-front-quarter.jpg',
+      faqs: [
+        {
+          q: 'What is the difference between a one step and a multi step correction?',
+          a: 'A one step polish lifts the lighter defects and brings the gloss back in a single pass. Multi step work cuts further and finishes finer, for paint with deeper swirls or oxidation. The evaluation decides which the car needs.',
+        },
+        {
+          q: 'Do I need a coating afterwards?',
+          a: 'It is recommended rather than required. Correction removes a thin amount of clear coat to level the defects, and a coating keeps that finish from going straight back to where it was.',
+        },
+        {
+          q: 'Will it remove deep scratches?',
+          a: 'Polishing removes light defects: swirl marks, wash marring, haze and oxidation. A scratch that has gone through the clear coat is paint work, not correction, and we will tell you that at the evaluation.',
+        },
+        {
+          q: 'How long does the result hold up?',
+          a: 'That depends almost entirely on how the car is washed afterwards. Automatic washes with spinning brushes put the swirls straight back in. A ceramic coating over the corrected paint is what makes it last.',
+        },
+        {
+          q: 'Where is paint correction done?',
+          a: 'At the shop in Port St. Lucie. Correction is measured against what the lighting shows, which is why it happens under proper lights rather than in a driveway.',
+        },
+      ],
+    },
+    {
       slug: 'window-tint',
-      name: 'Window Tint',
+      name: 'Window Tinting',
       shortDescription:
         'Tint that cuts heat and glare, blocks the ultraviolet rays that age an interior, and adds privacy.',
       priceFrom: 399,
       priceNote: 'Starting price; the final quote depends on the vehicle and the number of windows.',
       bookingUrl: null,
-      comingSoon: true,
+      comingSoon: false,
       image: 'white-bmw-x3-dark-tinted-glass.jpg',
       faqs: [
         {
-          q: 'Can I book window tint right now?',
-          a: 'Not yet. Tint is coming soon, so send a quote request rather than booking and we will be in touch with options and timing once it is available.',
+          q: 'Where does the tinting happen?',
+          a: 'At the shop in Port St. Lucie. Film has to go on in clean, still air and then cure, so tinting is not one of the services we bring to a driveway.',
         },
         {
           q: 'Is window tint legal in Florida?',
@@ -274,6 +312,9 @@ const config: SiteConfigInput = {
   hoursDisplay: 'By appointment, seven days a week',
 
   yearsInBusiness: 15,
+  // [owner] confirmed 2026-10-19. Anywhere a "since" line is printed, this is
+  // the number, not this year minus yearsInBusiness.
+  foundingYear: 2011,
   licenseNumber: null,
   insured: null,
 
@@ -282,9 +323,20 @@ const config: SiteConfigInput = {
   // visibly through `testimonials` instead, with no schema attached.
   reviews: [],
 
-  reviewCount: 440,
+  // Counted, with the date each was counted. The owner says 1,000+ across all
+  // platforms; 739 is what can be verified today, so the site publishes the
+  // floor of that (700+) and the exact counts sit beside it. Raising the
+  // figure needs links to wherever the rest are, which is question 1 on the
+  // client follow-up list.
+  reviewCountExact: 449,
+  reviewCountAsOf: '2026-10-18',
+  facebookReviewCount: 290,
+  facebookReviewsAsOf: '2026-10-19',
   reviewRating: 5.0,
+  reviewLink: 'https://share.google/c74H92ObjC9aOQCWb',
 
+  // Verbatim, first name and last initial, no dates, no platform logos. Nine
+  // from the 2026-10-18 Google read, ten more sent by the owner on 2026-10-19.
   testimonials: [
     {
       quote:
@@ -331,11 +383,64 @@ const config: SiteConfigInput = {
         'Chris and His team came out to do a bronze package on my 2016. And it looks better than ever period extremely satisfied with the work that was done today period highly recommend them!',
       name: 'John P.',
     },
+    {
+      quote:
+        'Daily driver and kid transport made good as new. Sebastian was our tech for this detailing and he did an amazing job. Wife and I were very pleased with the job, given the time limit needed for our kid’s pick up time. Made the Mother’s Day gift perfect.',
+      name: 'Josh C.',
+    },
+    {
+      quote:
+        'Chris came out with his team and they did a silver package on my vehicle that I’m looking to trade in and why it looks absolutely fabulous! Extremely satisfied with the job done. Highly recommend.',
+      name: 'Jon M.',
+    },
+    {
+      quote:
+        'I’m expecting my first child soon and I wanted to have my car clean because we have a lot of dog hair. Chris and his team came out and made my car look absolutely fabulous and now I feel very comfortable with my new child coming. Thank you guys so much, we greatly appreciate it.',
+      name: 'Julie M.',
+    },
+    {
+      quote:
+        'I was referred to this company by one of my friends and I’m very glad that I was sent this company. My bike looks absolutely fabulous now. Extremely satisfied with the work that was done today!',
+      name: 'Guy F.',
+    },
+    {
+      quote:
+        'I just received a silver package plus an engine detail by them and while my car looks amazing! Extremely grateful that I found them. Highly recommend them!',
+      name: 'Sarah H.',
+    },
+    // Anthony D.'s review is HELD OUT, not lost. It ends a clause with "taken
+    // care of." and verify check 18 flags any "of." as the signature of a
+    // blank {config.*} interpolation. The check is correct to be strict and is
+    // not ours to loosen on a client site, and the alternative was editing a
+    // customer's words, so the quote sits here instead of on the page. Say the
+    // word and it goes back, either edited or with the template rule widened.
+    {
+      quote:
+        'I just got my side-by-side clean by them and it looks immaculate. I’m putting it up for sale and I just wanted to make it look brand new and that’s exactly what this company did. Very satisfied with the work that was done!',
+      name: 'Richard M.',
+    },
+    {
+      quote:
+        'We just got a new car and we wanted it to look brand new since we bought it used. We wanted to make sure that our kids are driving in a very clean car and I’m very satisfied with the work that was done today by this company. It looks absolutely fabulous, thank you guys!',
+      name: 'Ariana R.',
+    },
+    {
+      quote:
+        'Amazing experience that I just had with this company! They came out to my house and made my truck look brand new, he also gave me a quote to do a ceramic coating on my M2, very excited to use them in the future!',
+      name: 'Anthony R.',
+    },
+    {
+      quote:
+        'Chris came today and did a light interior detail with a wash and wax on the exterior. My rims were in deep need of cleaning and he came out and put on a show! So glad I chose him to do my car!',
+      name: 'Kevonlian B.',
+    },
   ],
 
+  // Exact counted figures, not the rounded combined one, so the strip and the
+  // rating bar are never two different claims about the same thing.
   stats: [
-    { value: '440', suffix: '+', label: 'Five-star Google reviews' },
-    { value: '5.0', suffix: '', label: 'Google rating' },
+    { value: '449', suffix: '', label: 'Five-star Google reviews' },
+    { value: '290', suffix: '', label: 'Five-star Facebook reviews' },
     { value: '15', suffix: '', label: 'Years detailing the Treasure Coast' },
   ],
 
@@ -349,15 +454,42 @@ const config: SiteConfigInput = {
       towns: ['Stuart', 'Palm City', 'Jensen Beach', 'Hobe Sound', "Sewall's Point"],
     },
     {
+      county: 'Palm Beach County',
+      towns: ['Jupiter', 'Juno Beach', 'Tequesta'],
+    },
+    {
       county: 'Indian River County',
       towns: ['Vero Beach', 'Sebastian'],
     },
   ],
 
-  // No true before/after pair exists in either photo source. A pair is only
-  // ever the same vehicle from roughly the same angle, one dirty and one
-  // finished. The component ships; the section renders nothing until the
-  // client sends pairs. It is the first ask on the client follow-up list.
+  // The moving strip under the rating bar. Ordered by hand: the Urus leads
+  // because the owner asked for it, then the two Huracans, the Range Rover,
+  // the Tesla and the X6, then the strongest remaining exteriors. Every tile
+  // is checked for a readable plate and for faces before it goes in here.
+  carStrip: [
+    'gold-lamborghini-urus-rear-quarter.jpg',
+    'orange-lamborghini-huracan-driveway.jpg',
+    'white-lamborghini-red-wheels-driveway.jpg',
+    'black-range-rover-sport-front.jpg',
+    'blue-tesla-model-s-driveway.jpg',
+    'black-bmw-x6-finished-on-pavers.jpg',
+    'red-mercedes-maybach-gls-driveway.jpg',
+    'satin-black-audi-rs6-hood-open.jpg',
+    'blue-cadillac-escalade-esv-front-quarter.jpg',
+    'black-acura-nsx-parking-lot.jpg',
+    'red-bmw-x3-m50-outside-shop.jpg',
+    'grey-porsche-panamera-front-quarter.jpg',
+    'black-corvette-c8-side-profile-shop.jpg',
+    'white-mercedes-amg-gle-outside-shop.jpg',
+    'chevrolet-ssr-two-tone-paver-driveway.jpg',
+    'silver-tesla-model-x-driveway.jpg',
+  ],
+
+  // No true before/after pair exists in any photo source the client has sent.
+  // A pair is only ever the same vehicle from roughly the same angle, one
+  // dirty and one finished. The component ships; the section renders nothing
+  // until the client sends pairs. It is the first ask on the follow-up list.
   beforeAfter: [],
 
   // No promotion is published anywhere. Do not invent one.
@@ -371,10 +503,52 @@ const config: SiteConfigInput = {
     tiktok: 'https://www.tiktok.com/@premiumdetailingg',
   },
 
+  // The Instagram section. There is no live feed and no live follower count:
+  // both need the owner to connect the account through Behold or the
+  // Instagram Graph API, which is on the client follow-up list. Until then
+  // these are official permalinks pasted by hand, and the follower figure
+  // carries the date it was read.
+  social: {
+    instagram: {
+      handle: 'premiumdetailing__',
+      url: 'https://www.instagram.com/premiumdetailing__/',
+      followers: '20K',
+      followersAsOf: '2026-10-19',
+      posts: [
+        {
+          url: 'https://www.instagram.com/reel/DHpDXAzRXrK/',
+          excerpt: 'We brought this truck back to life with one of our more simpler packages, take a look at the results!',
+        },
+        {
+          url: 'https://www.instagram.com/reel/DGEfXCKx0AC/',
+          excerpt: 'Disaster detail brought back to life by yours truly.',
+        },
+        {
+          url: 'https://www.instagram.com/reel/DGG0L7rysWd/',
+          excerpt:
+            'We completed a paint enhancement + a 5 year ceramic coating + an interior ceramic coating on this 2025 BMW X7 M60i',
+        },
+        {
+          url: 'https://www.instagram.com/reel/DHhSDFixIdX/',
+          excerpt: 'This is truly one of the reasons why we’ve grown so much as a company. I can’t do it alone! Shout out to the team!',
+        },
+        {
+          url: 'https://www.instagram.com/reel/DChJb6xxlrs/',
+          excerpt: 'Here with WPTV to get our story out.',
+        },
+        {
+          url: 'https://www.instagram.com/reel/DFyb4s3ysvk/',
+          excerpt:
+            'This customer came in to have some minor scratches removed along with a one step polish and a 5 year coating on the paint, glass & wheels',
+        },
+      ],
+    },
+  },
+
   faqs: [
     {
       q: 'Do you come to me?',
-      a: 'Yes. The Bronze, Silver and Gold packages are mobile, so we come to your driveway and detail the vehicle where it sits. For ceramic coating, paint protection film and tint, ask when you book and we will confirm where the work happens.',
+      a: 'The Bronze, Silver and Gold packages come to you, so we detail the vehicle where it is parked. Ceramic coating, paint correction, paint protection film and window tint are done at the shop in Port St. Lucie.',
     },
     {
       q: 'Which package should I pick?',
@@ -394,15 +568,15 @@ const config: SiteConfigInput = {
     },
     {
       q: 'What areas do you cover?',
-      a: 'Port St. Lucie and the wider Treasure Coast, including Fort Pierce, Stuart, Palm City, Jensen Beach and Vero Beach. If you are not sure whether you are in range, send your ZIP code with your quote request.',
+      a: 'Port St. Lucie and the wider Treasure Coast, including Stuart, Palm City, Jensen Beach, Sewall’s Point, Jupiter, Fort Pierce and Vero Beach. If you are not sure whether you are in range, send your ZIP code with your quote request.',
     },
     {
       q: 'How do I book?',
-      a: 'Pick your package on the booking page and choose a time, or call us and we will sort it out over the phone. If you are not sure what you need yet, send a quote request and describe the vehicle.',
+      a: 'Pick your package on the booking page and choose a time, or call us and we will sort it out over the phone. Coating, correction, film and tint are quoted per vehicle, so send a quote request for those.',
     },
     {
-      q: 'Do you offer paint protection film and window tint?',
-      a: 'Both are coming soon. The pages are up with starting prices so you know roughly where they land, and you can send a quote request now to be told as soon as they are bookable.',
+      q: 'Can I get paint protection film and window tint from you?',
+      a: 'Yes, both are available. Neither has a booking calendar because the price depends on the vehicle and how much coverage you want, so send a quote request and we will come back with a figure and timing.',
     },
   ],
 
@@ -410,6 +584,39 @@ const config: SiteConfigInput = {
     hero: 'silver-coupe-garage-hex-lights.jpg',
     about: 'detailer-polishing-lifted-truck-driveway.jpg',
     gallery: [
+      { name: 'gold-lamborghini-urus-driveway-wash.jpg', tag: 'process' },
+      { name: 'gold-lamborghini-urus-rear-quarter.jpg', tag: 'exterior' },
+      { name: 'red-mercedes-maybach-gls-driveway.jpg', tag: 'exterior' },
+      { name: 'satin-black-audi-rs6-hood-open.jpg', tag: 'exterior' },
+      { name: 'black-porsche-macan-shop-hex-lights.jpg', tag: 'coatings' },
+      { name: 'mercedes-amg-gle-red-leather-interior.jpg', tag: 'interior' },
+      { name: 'bmw-x5-wheel-red-caliper-close.jpg', tag: 'wheels' },
+      { name: 'blue-cadillac-escalade-esv-front-quarter.jpg', tag: 'exterior' },
+      { name: 'harley-road-glide-blue-driveway.jpg', tag: 'bikes' },
+      { name: 'bmw-m2-cs-gold-wheels-shop-hex-lights.jpg', tag: 'coatings' },
+      { name: 'mercedes-gle-cargo-area-cleaned.jpg', tag: 'interior' },
+      { name: 'black-acura-nsx-parking-lot.jpg', tag: 'exterior' },
+      { name: 'red-ferrari-308-open-hood-carport.jpg', tag: 'process' },
+      { name: 'black-corvette-c8-side-profile-shop.jpg', tag: 'exterior' },
+      { name: 'grey-corvette-c8-convertible-driveway.jpg', tag: 'exterior' },
+      { name: 'red-bmw-x3-m50-outside-shop.jpg', tag: 'exterior' },
+      { name: 'white-mercedes-amg-gle-outside-shop.jpg', tag: 'exterior' },
+      { name: 'grey-porsche-panamera-front-quarter.jpg', tag: 'exterior' },
+      { name: 'black-bmw-m2-wet-driveway.jpg', tag: 'exterior' },
+      { name: 'ford-super-duty-wheel-mud-tire.jpg', tag: 'wheels' },
+      { name: 'black-bmw-x6-m-outside-shop.jpg', tag: 'exterior' },
+      { name: 'green-lexus-rx-front-quarter-shop.jpg', tag: 'exterior' },
+      { name: 'chevrolet-ssr-two-tone-paver-driveway.jpg', tag: 'exterior' },
+      { name: 'silver-tesla-model-x-driveway.jpg', tag: 'exterior' },
+      { name: 'white-bmw-x7-m-sport-street.jpg', tag: 'exterior' },
+      { name: 'grey-bmw-x5-front-quarter-shop.jpg', tag: 'exterior' },
+      { name: 'black-bmw-x5-paver-driveway.jpg', tag: 'exterior' },
+      { name: 'white-cadillac-escalade-front-quarter.jpg', tag: 'exterior' },
+      { name: 'blue-cadillac-escalade-front-detail.jpg', tag: 'exterior' },
+      { name: 'green-chevrolet-tahoe-front-quarter.jpg', tag: 'exterior' },
+      { name: 'green-chevrolet-tahoe-outside-shop.jpg', tag: 'exterior' },
+      { name: 'white-volvo-ex30-paver-driveway.jpg', tag: 'exterior' },
+      { name: 'class-c-motorhome-outside-shop.jpg', tag: 'exterior' },
       { name: 'black-bmw-x6-finished-on-pavers.jpg', tag: 'exterior' },
       { name: 'black-mercedes-cls-gloss-front-quarter.jpg', tag: 'coatings' },
       { name: 'porsche-cayenne-red-leather-interior.jpg', tag: 'interior' },
@@ -453,7 +660,7 @@ const config: SiteConfigInput = {
     },
     messageLabel: 'Tell us about your vehicle',
     messagePlaceholder:
-      'Year, make, and model, and what you want done: a package, ceramic coating, tint, or paint protection film.',
+      'Year, make, and model, and what you want done: a package, ceramic coating, paint correction, tint, or paint protection film.',
     submitLabel: 'Get My Quote',
   },
 

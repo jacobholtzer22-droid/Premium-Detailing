@@ -1,19 +1,90 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "redirects": [
-    { "source": "/bronze-package", "destination": "/services/bronze-package", "permanent": true },
-    { "source": "/silver-package", "destination": "/services/silver-package", "permanent": true },
-    { "source": "/gold-package", "destination": "/services/gold-package", "permanent": true },
-    { "source": "/ceramic-coating", "destination": "/services/ceramic-coating", "permanent": true },
-    { "source": "/ppf", "destination": "/services/paint-protection-film", "permanent": true },
-    { "source": "/tint", "destination": "/services/window-tint", "permanent": true },
-    { "source": "/book-now", "destination": "/book", "permanent": true },
-    { "source": "/blogs", "destination": "/", "permanent": true },
-    { "source": "/2025/10/03/top-tips-to-maintain-your-cars-gloss-between-detailing-visits", "destination": "/services/ceramic-coating", "permanent": true },
-    { "source": "/2025/10/03/mobile-detailing-why-having-the-service-come-to-you-makes-sense", "destination": "/", "permanent": true },
-    { "source": "/2025/10/03/paint-correction-101-remove-swirl-marks-scratches-oxidation", "destination": "/services/ceramic-coating", "permanent": true },
-    { "source": "/2025/10/03/interior-deep-cleaning-restore-your-cabin-to-like-new-condition", "destination": "/services/gold-package", "permanent": true },
-    { "source": "/2025/10/03/the-benefits-of-ceramic-coating-is-it-worth-the-investment", "destination": "/services/ceramic-coating", "permanent": true },
-    { "source": "/2025/10/03/what-is-car-detailing-and-why-its-more-than-just-a-wash", "destination": "/services", "permanent": true }
+    {
+      "source": "/bronze-package",
+      "destination": "/services/mobile-detailing",
+      "permanent": true
+    },
+    {
+      "source": "/silver-package",
+      "destination": "/services/mobile-detailing",
+      "permanent": true
+    },
+    {
+      "source": "/gold-package",
+      "destination": "/services/mobile-detailing",
+      "permanent": true
+    },
+    {
+      "source": "/services/bronze-package",
+      "destination": "/services/mobile-detailing",
+      "permanent": true
+    },
+    {
+      "source": "/services/silver-package",
+      "destination": "/services/mobile-detailing",
+      "permanent": true
+    },
+    {
+      "source": "/services/gold-package",
+      "destination": "/services/mobile-detailing",
+      "permanent": true
+    },
+    {
+      "source": "/ceramic-coating",
+      "destination": "/services/ceramic-coating",
+      "permanent": true
+    },
+    {
+      "source": "/ppf",
+      "destination": "/services/paint-protection-film",
+      "permanent": true
+    },
+    {
+      "source": "/tint",
+      "destination": "/services/window-tint",
+      "permanent": true
+    },
+    {
+      "source": "/book-now",
+      "destination": "/book",
+      "permanent": true
+    },
+    {
+      "source": "/blogs",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/2025/10/03/top-tips-to-maintain-your-cars-gloss-between-detailing-visits",
+      "destination": "/services/ceramic-coating",
+      "permanent": true
+    },
+    {
+      "source": "/2025/10/03/mobile-detailing-why-having-the-service-come-to-you-makes-sense",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/2025/10/03/paint-correction-101-remove-swirl-marks-scratches-oxidation",
+      "destination": "/services/paint-correction",
+      "permanent": true
+    },
+    {
+      "source": "/2025/10/03/interior-deep-cleaning-restore-your-cabin-to-like-new-condition",
+      "destination": "/services/mobile-detailing",
+      "permanent": true
+    },
+    {
+      "source": "/2025/10/03/the-benefits-of-ceramic-coating-is-it-worth-the-investment",
+      "destination": "/services/ceramic-coating",
+      "permanent": true
+    },
+    {
+      "source": "/2025/10/03/what-is-car-detailing-and-why-its-more-than-just-a-wash",
+      "destination": "/services",
+      "permanent": true
+    }
   ]
 }

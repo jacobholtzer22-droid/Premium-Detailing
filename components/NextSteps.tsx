@@ -38,9 +38,9 @@ export default function NextSteps() {
           Book a Detail
         </Link>
       </div>
-      {config.reviewCount !== null && (
+      {config.combinedReviewLabel !== null && (
         <p className="mt-6 border-t border-line pt-5 text-sm text-muted">
-          More than {config.reviewCount} five-star reviews on Google.
+          {config.combinedReviewLabel} five-star reviews across Google and Facebook.
           {config.profiles.gbp && (
             <>
               {' '}

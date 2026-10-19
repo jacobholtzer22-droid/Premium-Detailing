@@ -54,6 +54,30 @@ const faq = z.object({
   a: z.string().min(20),
 })
 
+/** YYYY-MM-DD. Used for the "as of" stamp on every counted figure. */
+const isoDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'must be YYYY-MM-DD')
+
+/**
+ * A priced tier INSIDE a service, for a service that is really a price ladder.
+ *
+ * This exists because the three detailing packages are one service sold at
+ * three levels, not three services. As separate `services` entries they
+ * crowded out the four paint and glass services on every grid, and the first
+ * of them became the site's headline trade. As tiers they are one card, one
+ * page and one comparison table, and each keeps its own booking calendar.
+ */
+const serviceTier = z.object({
+  name: z.string().min(2),
+  slug,
+  priceFrom: z.number().nullable(),
+  priceNote: z.string().nullable(),
+  /** The bullet list rendered in the comparison column. */
+  includes: z.array(z.string().min(4)).min(1),
+  bookingUrl: z.string().url().nullable(),
+  /** The id this tier's section carries, so /book can deep link to it. */
+  anchor: z.string().regex(SLUG_REGEX, 'must be kebab-case'),
+})
+
 export const siteConfigSchema = z
   .object({
     /**
@@ -119,6 +143,13 @@ export const siteConfigSchema = z
         z.object({
           slug,
           name: z.string().min(2),
+          /**
+           * The name as it reads in compact navigation: the services pills and
+           * the hero check list. null uses `name`. It exists so an acronym can
+           * ride along in one place ("Paint Protection Film (PPF)") without
+           * giving the service two names in titles, schema and breadcrumbs.
+           */
+          displayLabel: z.string().min(2).nullable().default(null),
           shortDescription: z.string().min(40).max(200),
           /** Starting price in whole dollars. The ONLY source of a dollar figure on the site. */
           priceFrom: z.number().nullable(),
@@ -135,6 +166,13 @@ export const siteConfigSchema = z
            * page swaps its booking CTAs for quote CTAs.
            */
           comingSoon: z.boolean().default(false),
+          /**
+           * Priced levels of this one service. Empty for a service that is
+           * sold as a single thing. When non-empty the service page renders a
+           * comparison table and /book renders one card per tier instead of
+           * one card for the service.
+           */
+          tiers: z.array(serviceTier).default([]),
           /** Filename in public/images/originals to use as the page image, or null. */
           image: z.string().nullable(),
           faqs: z.array(faq).min(3).max(6),
@@ -166,6 +204,12 @@ export const siteConfigSchema = z
     hoursDisplay: z.string().min(4).nullable().default(null),
 
     yearsInBusiness: z.number().int().positive().nullable(),
+    /**
+     * The year the business started, owner-confirmed. Where a "since" line is
+     * printed this is the number, rather than this year minus yearsInBusiness,
+     * which silently moves the founding date every January.
+     */
+    foundingYear: z.number().int().min(1900).nullable().default(null),
     licenseNumber: z.string().nullable(),
     insured: z.boolean().nullable(),
 
@@ -337,6 +381,22 @@ export const siteConfigSchema = z
     reviewRating: z.number().min(1).max(5).nullable().default(null),
 
     /**
+     * Counted review figures, each with the date it was counted.
+     *
+     * Exact numbers with a date, not a rounded claim: the owner says "1,000+
+     * across all platforms", and 1,000 is not a number this site can stand
+     * behind until he shows where the rest are. What IS verifiable is the
+     * Google count and the Facebook count, so those are what live here and the
+     * combined figure is derived from them by flooring to the nearest hundred.
+     */
+    reviewCountExact: z.number().int().positive().nullable().default(null),
+    reviewCountAsOf: isoDate.nullable().default(null),
+    facebookReviewCount: z.number().int().positive().nullable().default(null),
+    facebookReviewsAsOf: isoDate.nullable().default(null),
+    /** Where a "Leave a review" button points. Never invented. */
+    reviewLink: z.string().url().nullable().default(null),
+
+    /**
      * Visible testimonials with NO schema attached. Used when the reviews are
      * the business's own Google reviews, which Google treats as self-serving
      * when a site marks them up itself.
@@ -346,6 +406,8 @@ export const siteConfigSchema = z
         z.object({
           quote: z.string().min(20),
           name: z.string().min(2),
+          /** Which platform it was left on. Printed under the quote, never as a logo. */
+          source: z.string().min(2).default('Google'),
         }),
       )
       .default([]),
@@ -370,6 +432,48 @@ export const siteConfigSchema = z
         }),
       )
       .default([]),
+
+    /**
+     * Ordered filenames for the moving car strip under the hero. Each must be
+     * a key in the image manifest. Empty means the strip renders nothing.
+     *
+     * Ordered by hand rather than reusing the gallery order, because the strip
+     * is the one place on the page where the first three tiles do all the
+     * work.
+     */
+    carStrip: z.array(z.string().min(3)).default([]),
+
+    /**
+     * Social accounts that render as a SECTION rather than a footer link.
+     * profiles above still holds the plain links.
+     */
+    social: z
+      .object({
+        instagram: z
+          .object({
+            handle: z.string().min(2),
+            url: z.string().url(),
+            /** As written, e.g. "20K". A hand-read figure, so it carries a date. */
+            followers: z.string().min(2),
+            followersAsOf: isoDate,
+            /**
+             * Official permalinks. Empty renders nothing at all; there is no
+             * live feed, so a post only appears here once someone pastes it.
+             */
+            posts: z
+              .array(
+                z.object({
+                  url: z.string().url(),
+                  /** The caption opening, shown only on the fallback card. */
+                  excerpt: z.string().min(10),
+                }),
+              )
+              .default([]),
+          })
+          .nullable()
+          .default(null),
+      })
+      .default({ instagram: null }),
 
     /**
      * Before/after pairs for the drag slider. Empty means the section renders
@@ -422,6 +526,7 @@ export type SiteConfigInput = z.input<typeof siteConfigSchema>
 export type SiteConfigParsed = z.output<typeof siteConfigSchema>
 
 export type Service = SiteConfigParsed['services'][number]
+export type ServiceTier = Service['tiers'][number]
 export type ServiceArea = SiteConfigParsed['serviceAreas'][number]
 export type Review = SiteConfigParsed['reviews'][number]
 export type Faq = SiteConfigParsed['faqs'][number]
@@ -434,6 +539,14 @@ export type SiteConfig = SiteConfigParsed & {
   primaryService: Service
   /** What the business does, for H1s and titles. tradeName, else services[0].name. */
   tradeLabel: string
+  /**
+   * Google plus Facebook, floored to the nearest hundred, or null when neither
+   * count is set. Floored rather than rounded so the published figure is never
+   * larger than the counts behind it.
+   */
+  combinedReviewCount: number | null
+  /** "700+", or null. The ONE place that figure becomes text. */
+  combinedReviewLabel: string | null
 }
 
 /**
@@ -454,10 +567,15 @@ export function formatPhoneDisplay(e164: string): string {
 export function deriveConfig(parsed: SiteConfigParsed): SiteConfig {
   const primaryService = parsed.services[0]
   if (!primaryService) throw new Error('services must have at least one entry')
+  const counted = (parsed.reviewCountExact ?? 0) + (parsed.facebookReviewCount ?? 0)
+  const combinedReviewCount =
+    parsed.reviewCountExact === null && parsed.facebookReviewCount === null ? null : Math.floor(counted / 100) * 100
   return {
     ...parsed,
     phoneDisplay: formatPhoneDisplay(parsed.phone),
     primaryService,
     tradeLabel: parsed.tradeName ?? primaryService.name,
+    combinedReviewCount,
+    combinedReviewLabel: combinedReviewCount ? `${formatPrice(combinedReviewCount)}+` : null,
   }
 }
