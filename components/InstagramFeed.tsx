@@ -118,18 +118,26 @@ export default function InstagramFeed() {
           {posts.map((post, i) => (
             <li key={post.url} className="w-[85%] flex-shrink-0 snap-start md:w-auto">
               {/*
-                A 9/16 box capped at 640px tall, so max-width is 640 * 9 / 16 =
-                360. It was 540/304, which was shorter than Instagram's own
-                embed chrome plus a vertical video: every tile clipped its
-                bottom edge and some cut the player in half. 640 clears the
-                tallest of the six.
+                The 9/16 box is a RESERVE, not a cap: it holds the space so
+                nothing jumps while the embed loads, and the embed is then
+                allowed to make the tile taller than it.
+                Measured on these six: Instagram renders 653px at a 360px
+                width and 613px at 303px, so its height is the video plus a
+                chrome bar whose size does not track the width. No fixed ratio
+                contains both, which is why the previous 540px and 640px caps
+                both clipped the bottom edge. The box therefore carries no
+                overflow clipping of its own, so its automatic minimum size
+                grows to the content; the host inside it does the clipping
+                needed to keep the corners rounded.
+                max-w is 640 * 9 / 16 = 360, which is the reserve height the
+                tile starts at.
               */}
-              <div className="relative mx-auto aspect-[9/16] w-full max-w-[360px] overflow-hidden rounded-site border border-line bg-primary-soft">
+              <div className="relative mx-auto aspect-[9/16] w-full max-w-[360px] rounded-site border border-line bg-primary-soft">
                 <div
                   ref={(el) => {
                     hosts.current[i] = el
                   }}
-                  className="absolute inset-0 overflow-hidden" />
+                  className="w-full overflow-hidden rounded-site" />
                 {!ready[i] && (
                   <div className="absolute inset-0 flex flex-col justify-end gap-3 bg-primary-soft p-5">
                     <p className="text-base leading-relaxed text-ink">{post.excerpt}</p>
