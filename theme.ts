@@ -38,9 +38,12 @@ export interface Theme {
    */
   heroVariant: HeroVariant
   /**
-   * Wordmark for the header, or null to render the business name as type.
-   * `src` is a path under /public. The file is used as-is; it is not run
-   * through the image pipeline, because a logo must not be re-encoded.
+   * Wordmark image for the header, or null to set the name as type.
+   *
+   * null here for a reason: the only logo file that exists is 375x194, which
+   * is soft at header height even at 2x. The header sets the name instead and
+   * the real logo runs full size in the footer, where it has the width to
+   * hold up.
    */
   logo: { src: string; alt: string } | null
   /** The ONE corner radius for the site, in rem. 0 for hard edges. */
@@ -72,7 +75,7 @@ const theme: Theme = {
     onAccent: '#FFFFFF',
   },
   heroVariant: 'full-bleed',
-  logo: { src: '/brand/logo-header.png', alt: 'Premium Detailing' },
+  logo: null,
   radius: 0.75,
   shadow: '0 1px 2px rgb(12 18 32 / 0.08), 0 8px 24px rgb(12 18 32 / 0.06)',
 }

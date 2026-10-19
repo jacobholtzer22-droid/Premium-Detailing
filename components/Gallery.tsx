@@ -1,11 +1,12 @@
 'use client'
 
+import Link from 'next/link'
 import { useMemo, useState } from 'react'
 import { config } from '@/lib/config'
 import { getImage } from '@/lib/images'
 
 /**
- * config.images.gallery on a full-dark section: the homepage's guaranteed
+ * config.images.gallery on a full-dark section: the homepage's assured
  * change of visual treatment. Nothing renders when the list is empty.
  *
  * The photos are phone photos in mixed orientation, so every tile is a 4:5
@@ -18,7 +19,19 @@ import { getImage } from '@/lib/images'
  */
 const ALL = 'All'
 
-export default function Gallery({ heading = 'Recent Work' }: { heading?: string }) {
+interface Props {
+  heading?: string
+  /**
+   * Show at most this many tiles. A filter still applies to the WHOLE set and
+   * is then capped, so "Interior" never shows fewer photos than it has just
+   * because the unfiltered first slice happened to miss them.
+   */
+  limit?: number
+  /** Link to the full set. Omitted on the gallery page itself. */
+  moreHref?: string
+}
+
+export default function Gallery({ heading = 'Recent Work', limit, moreHref }: Props) {
   const items = useMemo(
     () =>
       config.images.gallery.map((g) => {
@@ -36,7 +49,17 @@ export default function Gallery({ heading = 'Recent Work' }: { heading?: string 
 
   const [active, setActive] = useState(ALL)
 
+  const shown = useMemo(
+    () => items.filter((i) => active === ALL || i.tag === active).map((i) => i.name),
+    [items, active],
+  )
+
   if (items.length === 0) return null
+
+  // Keyed on the WHOLE set, not the filtered view: the link means "there are
+  // more photos than this page shows", which stays true when a filter happens
+  // to narrow the result below the cap.
+  const capped = limit !== undefined && items.length > limit
 
   const label = (t: string) => (t === ALL ? ALL : t.charAt(0).toUpperCase() + t.slice(1))
 
@@ -63,7 +86,11 @@ export default function Gallery({ heading = 'Recent Work' }: { heading?: string 
 
         <div className="mt-8 grid grid-cols-2 gap-3 [grid-auto-flow:dense] lg:grid-cols-4">
           {items.map((it) => {
-            const hidden = active !== ALL && it.tag !== active
+            const matches = active === ALL || it.tag === active
+            // Rank within the filtered set, so the cap trims the tail of what
+            // is actually showing rather than a fixed slice of everything.
+            const rank = matches ? shown.indexOf(it.name) : -1
+            const hidden = !matches || (limit !== undefined && rank >= limit)
             return (
               <figure
                 key={it.name}
@@ -87,6 +114,17 @@ export default function Gallery({ heading = 'Recent Work' }: { heading?: string 
             )
           })}
         </div>
+
+        {moreHref && capped && (
+          <div className="mt-10">
+            <Link
+              href={moreHref}
+              className="btn inline-block rounded-site border-2 border-on-primary/40 px-6 py-3.5 text-base font-semibold text-on-primary hover:border-on-primary"
+            >
+              See more of our work
+            </Link>
+          </div>
+        )}
       </div>
     </section>
   )

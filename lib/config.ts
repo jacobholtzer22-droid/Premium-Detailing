@@ -1,7 +1,7 @@
 import rawConfig from '@/site.config'
 import { deriveConfig, siteConfigSchema, type SiteConfig } from './config-schema'
 
-export { CONTACT_ENDPOINT, HONEYPOT_FIELD } from './config-schema'
+export { CONTACT_ENDPOINT, HONEYPOT_FIELD, formatPrice } from './config-schema'
 export type { Faq, Review, Service, ServiceArea, SiteConfig } from './config-schema'
 
 function parseOrThrow(): SiteConfig {

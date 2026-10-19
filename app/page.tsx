@@ -35,13 +35,18 @@ export default async function HomePage() {
       <JsonLd data={faqPage(config.faqs)} />
 
       <Hero />
-      {/* The lead statement. Page width and left aligned like every other
-          section, with an accent rule and larger type, so it reads as a
-          designed band rather than a blog column dropped under the hero. */}
+      {/* The lead statement, with the three figures beside it at lg so the
+          right half is not empty. The numbers appear once on the page: the
+          full width strip that used to sit under How it works is gone. */}
       <section className="border-b border-line bg-surface">
-        <div className="mx-auto max-w-page px-4 py-16 sm:px-6 md:py-24">
-          <span aria-hidden="true" className="block h-1 w-16 bg-accent" />
-          <article className="home-lead mt-8 max-w-[62ch]">{content}</article>
+        <div className="mx-auto grid max-w-page items-start gap-12 px-4 py-16 sm:px-6 lg:grid-cols-12 md:py-24">
+          <div className="lg:col-span-7">
+            <span aria-hidden="true" className="block h-1 w-16 bg-accent" />
+            <article className="home-lead mt-8">{content}</article>
+          </div>
+          <div className="lg:col-span-5">
+            <Stats variant="card" />
+          </div>
         </div>
       </section>
       <ServiceGrid />
@@ -49,9 +54,8 @@ export default async function HomePage() {
       <BeforeAfter />
       <WhyUs />
       <HowItWorks />
-      <Stats />
       <Testimonials />
-      <Gallery />
+      <Gallery limit={12} moreHref="/gallery" />
       <Reviews />
       <AreaList />
       <Reveal>

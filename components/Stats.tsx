@@ -4,19 +4,19 @@ import { useEffect, useRef, useState } from 'react'
 import { config } from '@/lib/config'
 
 /**
- * Three figures, counted up once when the strip first comes into view.
+ * The three figures, counted up once when they first come into view.
  *
  * Integers count. Anything that is not a plain integer (a rating like "5.0")
- * is printed as written, because counting a decimal up looks like a bug. Under
- * `prefers-reduced-motion: reduce` every value renders final immediately, which
- * is checked in JavaScript here rather than in CSS because the number itself
- * is what changes, not a style.
+ * is printed as written, because counting a decimal up looks like a bug.
+ *
+ * `variant` only changes the arrangement, never the behavior: 'card' is the
+ * dark panel beside the homepage lead, 'strip' is the full width row. Both
+ * use the same observer and the same count.
  */
 function useCountUp(target: number | null, run: boolean, ms = 1200): number | null {
   // Seeded with the FINAL value, not zero, so the server-rendered HTML carries
   // the real number. A visitor whose JavaScript never runs reads "440", not
-  // "0". The count only starts once the strip is actually in view, which is
-  // below the fold, so the seeded value is never the thing anyone looks at.
+  // "0". The count only starts once the figures are actually in view.
   const [v, setV] = useState<number | null>(target)
   useEffect(() => {
     if (target === null || !run) return
@@ -39,13 +39,29 @@ function useCountUp(target: number | null, run: boolean, ms = 1200): number | nu
   return v
 }
 
-function Stat({ value, suffix, label, run }: { value: string; suffix: string; label: string; run: boolean }) {
+function Stat({
+  value,
+  suffix,
+  label,
+  run,
+  big,
+}: {
+  value: string
+  suffix: string
+  label: string
+  run: boolean
+  big: boolean
+}) {
   const isInt = /^\d+$/.test(value)
   const n = useCountUp(isInt ? Number(value) : null, run)
   const shown = isInt ? String(n ?? value) : value
   return (
     <div>
-      <p className="font-heading text-5xl font-extrabold tabular-nums text-on-primary md:text-6xl">
+      <p
+        className={`font-heading font-extrabold tabular-nums text-on-primary ${
+          big ? 'text-5xl md:text-6xl' : 'text-4xl'
+        }`}
+      >
         {shown}
         {suffix}
       </p>
@@ -54,7 +70,7 @@ function Stat({ value, suffix, label, run }: { value: string; suffix: string; la
   )
 }
 
-export default function Stats() {
+export default function Stats({ variant = 'strip' }: { variant?: 'strip' | 'card' }) {
   const ref = useRef<HTMLDivElement | null>(null)
   const [run, setRun] = useState(false)
 
@@ -81,12 +97,23 @@ export default function Stats() {
   }, [run])
 
   if (config.stats.length === 0) return null
+
+  const items = config.stats.map((s) => (
+    <Stat key={s.label} value={s.value} suffix={s.suffix ?? ''} label={s.label} run={run} big={variant === 'strip'} />
+  ))
+
+  if (variant === 'card') {
+    return (
+      <div ref={ref} className="rounded-site bg-primary p-8 text-on-primary md:p-10">
+        <div className="flex flex-col gap-8">{items}</div>
+      </div>
+    )
+  }
+
   return (
     <section className="bg-primary text-on-primary">
       <div ref={ref} className="mx-auto grid max-w-page gap-10 px-4 py-16 sm:grid-cols-3 sm:px-6 md:py-20">
-        {config.stats.map((s) => (
-          <Stat key={s.label} value={s.value} suffix={s.suffix ?? ''} label={s.label} run={run} />
-        ))}
+        {items}
       </div>
     </section>
   )

@@ -30,12 +30,12 @@ export default function Testimonials({ heading = 'What Treasure Coast Drivers Sa
           ))}
         </div>
         {config.profiles.gbp && (
-          <p className="mt-8">
+          <p className="mt-10">
             <a
               href={config.profiles.gbp}
               rel="noopener noreferrer"
               target="_blank"
-              className="text-sm font-semibold text-primary underline-offset-4 hover:underline"
+              className="btn inline-block rounded-site border-2 border-primary-dark px-6 py-3 text-sm font-semibold text-primary-dark hover:bg-primary-dark hover:text-on-primary"
             >
               Read all reviews on Google
             </a>

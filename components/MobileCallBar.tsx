@@ -24,7 +24,7 @@ export default function MobileCallBar() {
         href="/contact"
         className="flex min-h-[3.5rem] items-center justify-center bg-accent text-base font-semibold text-on-accent"
       >
-        Free Quote
+        Get a Quote
       </Link>
     </div>
   )

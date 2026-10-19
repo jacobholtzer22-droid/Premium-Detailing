@@ -24,6 +24,8 @@ next-env.d.ts
 *.MOV
 *.mov
 *.mp4
+# ...but the processed, committed clip under public/video is part of the site
+!public/video/*.mp4
 
 # local tooling
 .claude/

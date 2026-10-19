@@ -73,7 +73,7 @@ async function brightestUnderCopy(file: string, view: 'desktop' | 'mobile'): Pro
   // Desktop is 1440x702 (78vh of 900) at half scale; mobile is 390x658.
   const [W, H] = view === 'desktop' ? [720, 351] : [390, 658]
   const [x0, y0, x1, y1] = HERO_COPY_BOX[view]
-  const { data } = await sharp(file).resize(W, H, { fit: 'cover', position: 'centre' }).removeAlpha().raw().toBuffer({ resolveWithObject: true })
+  const { data } = await sharp(file).resize(W, H, { fit: 'cover', position: 'center' }).removeAlpha().raw().toBuffer({ resolveWithObject: true })
   const [sr, sg, sb] = HERO_SCRIM_RGB
   const lums: number[] = []
   for (let y = Math.floor(y0 * H); y < Math.floor(y1 * H); y++) {

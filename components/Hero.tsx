@@ -49,7 +49,7 @@ export default function Hero() {
         {/* Optional. Sits on the poster at the same z, never replaces it. */}
         {config.images.heroVideo && <HeroVideo {...config.images.heroVideo} />}
         <div aria-hidden="true" className="absolute inset-0 z-[1]" style={{ background: heroScrimCss() }} />
-        <div className="relative z-10 mx-auto w-full max-w-page px-4 pb-14 pt-40 sm:px-6 md:pb-20">
+        <div className="relative z-10 mx-auto w-full max-w-page px-4 pb-14 pt-48 sm:px-6 sm:pt-40 md:pb-20">
           <p
             className="text-sm font-semibold uppercase tracking-[0.2em] hero-rise"
             style={{ opacity: HERO_EYEBROW_OPACITY, ...rise(0) }}

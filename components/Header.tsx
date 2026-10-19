@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { config } from '@/lib/config'
 import theme from '@/theme'
 import Phone from './Phone'
+import Wordmark from './Wordmark'
 
 const NAV = [
   { href: '/', label: 'Home' },
@@ -43,7 +44,7 @@ export default function Header() {
             // eslint-disable-next-line @next/next/no-img-element
             <img src={logo.src} alt={logo.alt} className="h-10 w-auto md:h-12" width={375} height={194} />
           ) : (
-            <span className="font-heading text-xl font-extrabold tracking-tight">{config.displayName}</span>
+            <Wordmark />
           )}
         </Link>
 

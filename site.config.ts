@@ -368,6 +368,7 @@ const config: SiteConfigInput = {
     facebook: 'https://www.facebook.com/Premiumdetailingg',
     instagram: 'https://www.instagram.com/premiumdetailing__',
     yelp: null,
+    tiktok: 'https://www.tiktok.com/@premiumdetailingg',
   },
 
   faqs: [

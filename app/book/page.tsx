@@ -3,7 +3,7 @@ import Link from 'next/link'
 import CtaBand from '@/components/CtaBand'
 import Phone from '@/components/Phone'
 import Reveal from '@/components/Reveal'
-import { config } from '@/lib/config'
+import { config, formatPrice } from '@/lib/config'
 import { buildMetadata } from '@/lib/seo'
 
 const DESCRIPTION =
@@ -61,7 +61,7 @@ export default function BookPage() {
 
                   {s.priceFrom !== null && (
                     <p className="mt-4 font-heading text-3xl font-extrabold tabular-nums text-primary-dark">
-                      From ${s.priceFrom}
+                      From ${formatPrice(s.priceFrom)}
                     </p>
                   )}
                   {s.priceNote && <p className="mt-1 text-sm text-muted">{s.priceNote}</p>}

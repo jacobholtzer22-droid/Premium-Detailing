@@ -1,4 +1,4 @@
-import { config } from './config'
+import { config, formatPrice } from './config'
 import type { Faq, Service, ServiceArea, SiteConfig } from './config-schema'
 import { getImage, hasImage } from './images'
 
@@ -164,9 +164,12 @@ export function service(s: Service): Json {
     ...when(s.priceFrom, (price) => ({
       offers: {
         '@type': 'Offer',
+        // Raw digits, never grouped: schema.org requires a plain numeric value
+        // here, and "3,999" would make the Offer invalid. Only the human
+        // readable description below gets separators.
         price: String(price),
         priceCurrency: 'USD',
-        ...when(s.priceNote, (note) => ({ description: `From $${price} ${note}` })),
+        ...when(s.priceNote, (note) => ({ description: `From $${formatPrice(price)} ${note}` })),
       },
     })),
   }

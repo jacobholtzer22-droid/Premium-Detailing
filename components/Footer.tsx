@@ -7,6 +7,7 @@ const PROFILE_LABELS: Record<string, string> = {
   facebook: 'Facebook',
   instagram: 'Instagram',
   yelp: 'Yelp',
+  tiktok: 'TikTok',
 }
 
 export default function Footer() {
@@ -17,6 +18,19 @@ export default function Footer() {
     <footer className="mt-16 border-t border-line bg-primary-dark text-on-primary">
       <div className="mx-auto grid max-w-page gap-10 px-4 py-12 sm:px-6 md:grid-cols-4">
         <div>
+          {/* The full logo runs here rather than in the header: it is a small
+              file, and the footer is the one place it has the width to read.
+              On a white chip because the artwork is drawn for light ground. */}
+          <span className="mb-5 inline-block rounded-site bg-white p-3">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/brand/logo-on-white.png"
+              alt={`${config.displayName} logo`}
+              width={200}
+              height={113}
+              className="block h-auto w-[200px]"
+            />
+          </span>
           <p className="font-heading text-lg font-bold">{config.displayName}</p>
           <p className="mt-2 text-sm opacity-80">{config.tagline}</p>
           <p className="mt-4 text-sm">

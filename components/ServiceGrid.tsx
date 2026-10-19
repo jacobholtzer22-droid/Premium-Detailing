@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { config } from '@/lib/config'
+import { config, formatPrice } from '@/lib/config'
 import Img from './Img'
 import Reveal from './Reveal'
 
@@ -59,7 +59,7 @@ export default function ServiceGrid({ heading = 'Our Services', exclude }: Props
                     <p className="mt-3 flex-1 text-base leading-relaxed text-muted">{s.shortDescription}</p>
                     <div className="mt-5 flex items-baseline justify-between gap-3 border-t border-line pt-4">
                       <span className="text-sm font-semibold tabular-nums text-ink">
-                        {s.priceFrom !== null ? `From $${s.priceFrom}` : 'Quoted on site'}
+                        {s.priceFrom !== null ? `From $${formatPrice(s.priceFrom)}` : 'Quoted on site'}
                       </span>
                       <span className="text-sm font-semibold text-accent">Learn more</span>
                     </div>

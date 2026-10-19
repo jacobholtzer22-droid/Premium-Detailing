@@ -96,7 +96,7 @@ export const siteConfigSchema = z
      * Without this the template uses services[0].name, which is correct when
      * the first service is the headline trade and wrong when the service list
      * is a price ladder: it put "Bronze Package in Port St. Lucie, FL" in the
-     * homepage H1. null keeps the old behaviour.
+     * homepage H1. null keeps the old behavior.
      */
     tradeName: z.string().min(3).nullable().default(null),
 
@@ -192,6 +192,7 @@ export const siteConfigSchema = z
         facebook: z.string().url().nullable(),
         instagram: z.string().url().nullable(),
         yelp: z.string().url().nullable(),
+        tiktok: z.string().url().nullable(),
       })
       .partial(),
 
@@ -426,6 +427,15 @@ export type SiteConfig = SiteConfigParsed & {
   primaryService: Service
   /** What the business does, for H1s and titles. tradeName, else services[0].name. */
   tradeLabel: string
+}
+
+/**
+ * 3999 -> "3,999". The ONE place a price is turned into text, so a four digit
+ * starting price reads as money everywhere it appears instead of "$3999".
+ * Prices themselves still live only in site.config.ts, never in content.
+ */
+export function formatPrice(amount: number): string {
+  return amount.toLocaleString('en-US')
 }
 
 /** "+15555550123" -> "(555) 555-0123". Authored nowhere; derived from config.phone. */

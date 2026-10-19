@@ -9,7 +9,7 @@ import JsonLd from '@/components/JsonLd'
 import PageHeader from '@/components/PageHeader'
 import Link from 'next/link'
 import ServiceGrid from '@/components/ServiceGrid'
-import { config, getService } from '@/lib/config'
+import { config, formatPrice, getService } from '@/lib/config'
 import { loadContent, readFrontmatter } from '@/lib/content'
 import { breadcrumbList, faqPage, service as serviceSchema } from '@/lib/schema'
 import { buildMetadata } from '@/lib/seo'
@@ -77,7 +77,7 @@ export default async function ServicePage({ params }: { params: { slug: string }
               <p className="text-sm font-semibold uppercase tracking-wide text-muted">
                 {service.comingSoon ? 'Coming soon' : 'Pricing'}
               </p>
-              <p className="mt-2 font-heading text-3xl font-bold text-primary-dark">From ${service.priceFrom}</p>
+              <p className="mt-2 font-heading text-3xl font-bold text-primary-dark">From ${formatPrice(service.priceFrom)}</p>
               {service.priceNote && <p className="mt-1 text-sm text-muted">{service.priceNote}</p>}
               {/* A service that cannot be booked never links to a calendar. */}
               {service.bookingUrl && !service.comingSoon ? (
