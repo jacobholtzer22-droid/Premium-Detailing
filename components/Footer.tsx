@@ -99,6 +99,11 @@ export default function Footer() {
               )}
             </>
           )}
+          <p className="mt-6 text-sm">
+            <Link href="/reviews" className="underline-offset-2 hover:underline">
+              Read our reviews
+            </Link>
+          </p>
           {profiles.length > 0 && (
             <ul className="mt-6 flex flex-wrap gap-4 text-sm">
               {profiles.map(([key, url]) => (

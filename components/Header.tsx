@@ -10,6 +10,7 @@ const NAV = [
   { href: '/services', label: 'Services' },
   { href: '/book', label: 'Book' },
   { href: '/gallery', label: 'Work' },
+  { href: '/reviews', label: 'Reviews' },
   { href: '/about', label: 'About' },
   { href: '/contact', label: 'Contact' },
 ]
@@ -70,6 +71,21 @@ export default function Header() {
 
           <div className="flex items-center gap-3">
             <Phone className="hidden text-sm font-semibold text-ink lg:inline" />
+            {/* Desktop only. On a phone the bar is already carrying a logo, a
+                nav row and a booking button; a fourth element turns it into a
+                list of things to ignore. */}
+            {config.reviewRating !== null && config.combinedReviewLabel !== null && (
+              <Link
+                href="/reviews"
+                className="hidden items-center gap-1.5 rounded-full border border-line px-3 py-1.5 text-xs font-semibold text-ink hover:border-accent lg:inline-flex"
+              >
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="var(--c-star)" aria-hidden="true">
+                  <path d="M12 2.6l2.94 5.96 6.58.96-4.76 4.64 1.12 6.55L12 17.62l-5.88 3.09 1.12-6.55L2.48 9.52l6.58-.96z" />
+                </svg>
+                {config.reviewRating.toFixed(1)}
+                <span className="font-medium text-muted">{config.combinedReviewLabel} reviews</span>
+              </Link>
+            )}
             <Link
               href="/book"
               className="btn rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-on-accent hover:bg-accent-dark"

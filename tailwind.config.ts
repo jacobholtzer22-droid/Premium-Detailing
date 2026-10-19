@@ -23,6 +23,7 @@ const config: Config = {
         line: 'var(--c-line)',
         'on-primary': 'var(--c-on-primary)',
         'on-accent': 'var(--c-on-accent)',
+        star: 'var(--c-star)',
       },
       fontFamily: {
         heading: ['var(--font-heading)', 'ui-sans-serif', 'system-ui', 'sans-serif'],

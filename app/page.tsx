@@ -7,7 +7,9 @@ import FaqAccordion from '@/components/FaqAccordion'
 import Gallery from '@/components/Gallery'
 import Hero from '@/components/Hero'
 import HowItWorks from '@/components/HowItWorks'
+import InstagramFeed from '@/components/InstagramFeed'
 import JsonLd from '@/components/JsonLd'
+import RatingBar from '@/components/RatingBar'
 import Reveal from '@/components/Reveal'
 import Reviews from '@/components/Reviews'
 import ServiceGrid from '@/components/ServiceGrid'
@@ -36,8 +38,10 @@ export default async function HomePage() {
       <JsonLd data={faqPage(config.faqs)} />
 
       <Hero />
-      {/* His own cars, straight after the hero: the fastest way to answer
-          "what do these people actually turn out" is to show it. */}
+      {/* Proof, then the cars, then the words. Somebody who lands here cold
+          gets the rating and the work in the first screen after the hero,
+          which is the order they would judge a detailer in person. */}
+      <RatingBar />
       <CarStrip />
       {/* The lead statement, with the three figures beside it at lg so the
           right half is not empty. The numbers appear once on the page: the
@@ -54,12 +58,15 @@ export default async function HomePage() {
         </div>
       </section>
       <ServiceGrid />
+      {/* Straight after the services, so the first question a price raises is
+          answered by somebody who already paid it. */}
+      <Testimonials />
       {/* Renders nothing until the client sends true before/after pairs. */}
       <BeforeAfter />
       <WhyUs />
       <HowItWorks />
-      <Testimonials />
       <Gallery limit={12} moreHref="/gallery" />
+      <InstagramFeed />
       <Reviews />
       <AreaList />
       <Reveal>

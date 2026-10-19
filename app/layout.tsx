@@ -58,6 +58,7 @@ const cssVars = {
   '--c-line': theme.palette.line,
   '--c-on-primary': theme.palette.onPrimary,
   '--c-on-accent': theme.palette.onAccent,
+  '--c-star': theme.palette.star,
   '--radius': `${theme.radius}rem`,
   '--shadow': theme.shadow,
 } as CSSProperties

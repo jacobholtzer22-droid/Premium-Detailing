@@ -42,6 +42,12 @@ export interface Theme {
     line: string
     onPrimary: string
     onAccent: string
+    /**
+     * Star glyphs ONLY. A generic review-star amber that belongs to no
+     * platform, so the rating bar is not borrowing Google's color or its
+     * mark. It is never a button, never text, never a border.
+     */
+    star: string
   }
   /**
    * 'full-bleed': client photo behind a dark scrim, headline and phone CTA
@@ -94,6 +100,7 @@ const theme: Theme = {
     line: '#E2E5EA',
     onPrimary: '#F6F7F9',
     onAccent: '#FFFFFF',
+    star: '#F4B400',
   },
   heroVariant: 'full-bleed',
   logo: { src: '/brand/logo.png', alt: 'Premium Detailing' },

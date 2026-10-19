@@ -40,21 +40,11 @@ export default function NextSteps() {
       </div>
       {config.combinedReviewLabel !== null && (
         <p className="mt-6 border-t border-line pt-5 text-sm text-muted">
-          {config.combinedReviewLabel} five-star reviews across Google and Facebook.
-          {config.profiles.gbp && (
-            <>
-              {' '}
-              <a
-                href={config.profiles.gbp}
-                rel="noopener noreferrer"
-                target="_blank"
-                className="font-semibold text-primary underline-offset-4 hover:underline"
-              >
-                Read them
-              </a>
-              .
-            </>
-          )}
+          {config.combinedReviewLabel} five-star reviews across Google and Facebook.{' '}
+          <Link href="/reviews" className="font-semibold text-primary underline-offset-4 hover:underline">
+            Read them
+          </Link>
+          .
         </p>
       )}
     </div>
