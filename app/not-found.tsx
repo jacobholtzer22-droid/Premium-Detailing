@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Image from 'next/image'
 import Link from 'next/link'
 import { config } from '@/lib/config'
 
@@ -10,6 +11,13 @@ export const metadata: Metadata = {
 export default function NotFound() {
   return (
     <section className="mx-auto max-w-page px-4 py-24 text-center sm:px-6">
+      <Image
+        src="/brand/logo.png"
+        alt={`${config.displayName} logo`}
+        width={882}
+        height={465}
+        className="mx-auto mb-10 block h-auto w-[240px] max-w-full"
+      />
       <h1 className="font-heading text-4xl font-bold text-primary-dark">Page not found</h1>
       <p className="mt-4 text-muted">That page does not exist. Head back to the homepage or get in touch.</p>
       <div className="mt-8 flex justify-center gap-4">

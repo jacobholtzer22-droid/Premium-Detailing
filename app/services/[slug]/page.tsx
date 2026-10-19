@@ -57,7 +57,7 @@ export default async function ServicePage({ params }: { params: { slug: string }
 
       {service.comingSoon && (
         <div className="mx-auto max-w-page px-4 pt-8 sm:px-6">
-          <p className="rounded-site border-l-4 border-accent bg-primary-soft px-5 py-4 text-base text-ink">
+          <p className="rounded-site border-l-4 border-blue-text bg-primary-soft px-5 py-4 text-base text-ink">
             <strong className="font-semibold">Coming soon.</strong> This service is not bookable yet. Send a quote
             request and we will come back to you with options and timing as soon as it is available.
           </p>

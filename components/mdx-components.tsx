@@ -48,7 +48,7 @@ export const mdxComponents: MDXComponents = {
   ol: (props) => <ol className="mt-4 list-decimal space-y-2 pl-6 text-base leading-relaxed text-ink" {...props} />,
   li: (props) => <li {...props} />,
   strong: (props) => <strong className="font-semibold text-ink" {...props} />,
-  blockquote: (props) => <blockquote className="mt-6 border-l-4 border-accent pl-4 italic text-muted" {...props} />,
+  blockquote: (props) => <blockquote className="mt-6 border-l-4 border-blue-text pl-4 italic text-muted" {...props} />,
   hr: () => <hr className="my-10 border-line" />,
   a: Anchor,
   Phone,

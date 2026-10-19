@@ -383,6 +383,13 @@ export const siteConfigSchema = z
           before: z.object({ src: z.string(), alt: z.string().min(10) }),
           after: z.object({ src: z.string(), alt: z.string().min(10) }),
           caption: z.string().nullable(),
+          /**
+           * Set from the finished files' pixel dimensions by
+           * scripts/add-pair.mjs, never guessed. A portrait pair gets a 4/5
+           * stage capped at 520px with the copy beside it; a landscape pair
+           * keeps the wide stage with the copy above.
+           */
+          orientation: z.enum(['portrait', 'landscape']).default('landscape'),
           /** Limit this pair to one service page. null means it shows everywhere. */
           service: z.string().nullable().default(null),
         }),

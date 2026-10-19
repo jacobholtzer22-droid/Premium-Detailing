@@ -14,7 +14,7 @@ export default function Credentials({ className = '' }: { className?: string }) 
     <ul className={`flex flex-wrap gap-x-6 gap-y-2 text-sm font-medium text-primary-dark ${className}`}>
       {items.map((item) => (
         <li key={item} className="flex items-center gap-2">
-          <span aria-hidden="true" className="inline-block h-2 w-2 rounded-full bg-accent" />
+          <span aria-hidden="true" className="inline-block h-2 w-2 rounded-full bg-blue-text" />
           {item}
         </li>
       ))}

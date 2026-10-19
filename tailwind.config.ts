@@ -14,6 +14,8 @@ const config: Config = {
         'primary-soft': 'var(--c-primary-soft)',
         accent: 'var(--c-accent)',
         'accent-dark': 'var(--c-accent-dark)',
+        blue: 'var(--c-blue)',
+        'blue-text': 'var(--c-blue-text)',
         bg: 'var(--c-bg)',
         surface: 'var(--c-surface)',
         ink: 'var(--c-ink)',

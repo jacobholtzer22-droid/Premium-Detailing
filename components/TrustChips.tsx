@@ -25,7 +25,7 @@ export default function TrustChips({ className = '' }: { className?: string }) {
         <li key={item} className="flex items-start gap-2.5">
           <span
             aria-hidden="true"
-            className="mt-0.5 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-accent"
+            className="mt-0.5 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-blue"
           >
             <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#FFFFFF" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round">
               <path d="m4 12.5 5.5 5.5L20 7" />

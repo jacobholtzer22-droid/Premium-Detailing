@@ -20,7 +20,7 @@ export default function HowItWorks() {
         <ol className="mt-10 grid gap-8 md:grid-cols-3">
           {STEPS.map((s, i) => (
             <Reveal key={s.n} delay={Math.min(i * 60, 360)} as="li">
-              <p className="font-heading text-4xl font-extrabold tabular-nums text-accent">{s.n}</p>
+              <p className="font-heading text-4xl font-extrabold tabular-nums text-blue-text">{s.n}</p>
               <h3 className="mt-3 font-heading text-lg font-bold text-primary-dark">{s.title}</h3>
               <p className="mt-2 text-base leading-relaxed text-muted">{s.body}</p>
             </Reveal>

@@ -4,7 +4,14 @@ import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 import type { CSSProperties } from 'react'
 import { config } from '@/lib/config'
-import { getImage } from '@/lib/images'
+
+/**
+ * Pair files live in public/images/before-after/, NOT in the image manifest.
+ * They are a matched set written by scripts/add-pair.mjs at identical
+ * dimensions, so they are referenced by path and sized by the stage rather
+ * than by intrinsic width and height.
+ */
+const PAIR_DIR = '/images/before-after'
 
 /**
  * Drag-to-compare before/after slider.
@@ -70,8 +77,8 @@ export default function BeforeAfter({ service }: Props) {
 
   const pair = pairs[Math.min(idx, pairs.length - 1)]
   if (!pair) return null
-  const before = getImage(pair.before.src)
-  const after = getImage(pair.after.src)
+  const before = { src: `${PAIR_DIR}/${pair.before.src}`, alt: pair.before.alt }
+  const after = { src: `${PAIR_DIR}/${pair.after.src}`, alt: pair.after.alt }
 
   const go = (next: number) => {
     const n = (next + pairs.length) % pairs.length
@@ -86,44 +93,59 @@ export default function BeforeAfter({ service }: Props) {
 
   const stageVars = { '--pos': `${pos}%` } as CSSProperties
 
+  // A portrait pair in a 16/10 stage is two slivers of car with the sky
+  // cropped off, so portrait gets its own shape and the copy moves beside it.
+  const portrait = pair.orientation === 'portrait'
+
+  const copy = (
+    <>
+      <p className="text-sm font-semibold uppercase tracking-[0.2em] text-blue">See the difference</p>
+      <h2 className="mt-3 font-heading text-3xl font-bold md:text-4xl">Drag to reveal the transformation.</h2>
+      <p className="mt-3 max-w-2xl text-base text-on-primary/80">
+        Same vehicle, same day. Pull the handle from dirty to detailed.
+      </p>
+    </>
+  )
+
   return (
     <section ref={sectionRef} className="bg-primary text-on-primary">
-      <div className="mx-auto max-w-page px-4 py-16 sm:px-6 md:py-24">
-        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-accent">See the difference</p>
-        <h2 className="mt-3 font-heading text-3xl font-bold md:text-4xl">Drag to reveal the transformation.</h2>
-        <p className="mt-3 max-w-2xl text-base text-on-primary/80">
-          Same vehicle, same day. Pull the handle from dirty to detailed.
-        </p>
+      <div
+        className={
+          portrait
+            ? 'mx-auto grid max-w-page items-center gap-12 px-4 py-16 sm:px-6 lg:grid-cols-2 md:py-24'
+            : 'mx-auto max-w-page px-4 py-16 sm:px-6 md:py-24'
+        }
+      >
+        <div>{copy}</div>
 
+        <div className={portrait ? 'w-full' : ''}>
         <div
           style={stageVars}
-          className="relative mt-10 aspect-[4/5] w-full overflow-hidden rounded-site md:aspect-[16/10]"
+          className={
+            portrait
+              ? 'relative mx-auto mt-8 aspect-[4/5] w-full max-w-[520px] overflow-hidden rounded-site lg:mt-0'
+              : 'relative mt-10 aspect-[4/5] w-full overflow-hidden rounded-site md:aspect-[16/10]'
+          }
         >
           <img
             src={after.src}
-            srcSet={after.srcSet}
-            sizes="(min-width:1024px) 960px, 100vw"
-            width={after.width}
-            height={after.height}
-            alt={pair.after.alt}
+            alt={after.alt}
             decoding="async"
+            loading="lazy"
             className={`ba-fade absolute inset-0 h-full w-full object-cover ${fading ? 'opacity-0' : 'opacity-100'}`}
           />
           <img
             src={before.src}
-            srcSet={before.srcSet}
-            sizes="(min-width:1024px) 960px, 100vw"
-            width={before.width}
-            height={before.height}
-            alt={pair.before.alt}
+            alt={before.alt}
             decoding="async"
+            loading="lazy"
             className={`ba-fade absolute inset-0 h-full w-full object-cover ${fading ? 'opacity-0' : 'opacity-100'}`}
             style={{ clipPath: 'inset(0 calc(100% - var(--pos)) 0 0)' }}
           />
 
           <span
             aria-hidden="true"
-            className={`pointer-events-none absolute left-3 top-3 rounded-full bg-primary-dark/70 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] ${
+            className={`pointer-events-none absolute left-3 top-3 rounded-full bg-primary-dark/70 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-blue ${
               pos < 12 ? 'opacity-0' : 'opacity-100'
             } ba-fade`}
           >
@@ -131,7 +153,7 @@ export default function BeforeAfter({ service }: Props) {
           </span>
           <span
             aria-hidden="true"
-            className={`pointer-events-none absolute right-3 top-3 rounded-full bg-primary-dark/70 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] ${
+            className={`pointer-events-none absolute right-3 top-3 rounded-full bg-primary-dark/70 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-blue ${
               pos > 88 ? 'opacity-0' : 'opacity-100'
             } ba-fade`}
           >
@@ -233,7 +255,9 @@ export default function BeforeAfter({ service }: Props) {
         {pair.caption && <p className="mt-4 text-base text-on-primary/80">{pair.caption}</p>}
         <p className="mt-2 text-sm text-on-primary/60">Drag the handle, or focus it and use the arrow keys.</p>
 
-        <div className="mt-10 flex flex-wrap items-center gap-5">
+        </div>
+
+        <div className="mt-10 flex flex-wrap items-center gap-5 lg:col-span-2">
           <p className="font-heading text-xl font-bold">Want results like this on your car?</p>
           <Link href="/book" className="btn rounded-site bg-accent px-6 py-3.5 text-base font-semibold text-on-accent hover:bg-accent-dark">
             Book a Detail

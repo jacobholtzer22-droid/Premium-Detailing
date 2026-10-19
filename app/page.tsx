@@ -41,7 +41,7 @@ export default async function HomePage() {
       <section className="border-b border-line bg-surface">
         <div className="mx-auto grid max-w-page items-start gap-12 px-4 py-16 sm:px-6 lg:grid-cols-12 md:py-24">
           <div className="lg:col-span-7">
-            <span aria-hidden="true" className="block h-1 w-16 bg-accent" />
+            <span aria-hidden="true" className="block h-1 w-16 bg-blue-text" />
             <article className="home-lead mt-8">{content}</article>
           </div>
           <div className="lg:col-span-5">

@@ -18,9 +18,21 @@ export interface Theme {
     primary: string
     primaryDark: string
     primarySoft: string
-    /** The single accent. Buttons, the call bar, small marks. Under 5% of any page. */
+    /**
+     * The single ACTION color, sampled from the logo wordmark. Buttons, the
+     * active tab, the active filter pill, the slider handle, focus rings.
+     * Nothing decorative: if it is not something you click, it is not accent.
+     */
     accent: string
     accentDark: string
+    /**
+     * The logo cyan. DARK SURFACES AND NON-TEXT GRAPHICS ONLY. At 2.43:1 on
+     * white it is not readable as text on a light ground, which is what
+     * blueText exists for.
+     */
+    blue: string
+    /** The same hue darkened until it clears 4.5:1 on bg and surface. */
+    blueText: string
     /** The off-white page ground. */
     bg: string
     surface: string
@@ -53,19 +65,28 @@ export interface Theme {
 }
 
 /**
- * Direction: "Showroom". Near-black navy carries the header, footer and CTA
- * band; content alternates off-white and white so the photography is the only
- * thing that is ever loud. The accent is sampled from the client's own logo
- * wordmark (#E81820) and darkened to #D1232A so white sits on it at 5.27:1.
- * The logo's cyan stays inside the logo and appears nowhere else on the site.
+ * Direction: "Showroom", now built from the client's own logo rather than
+ * beside it.
+ *
+ * Both colors are sampled from public/brand/logo.png with a 5x5 median taken
+ * at the thickest point of each shape, so neither is an anti-aliased edge:
+ * red #EC1D24 from the wordmark stroke, cyan #00B3EA from the boat hull.
+ *
+ * accent is that red darkened to #DF131A, which is the lightest value where
+ * white sits on it at 4.5:1 AND it works as link text on the light grounds.
+ * The dark surfaces are no longer a neutral near-black: they are the cyan hue
+ * (194 degrees) at 55% saturation, so the whole page sits in the logo's own
+ * color family. blueText is the cyan darkened until it is readable on white.
  */
 const theme: Theme = {
   palette: {
-    primary: '#0C1220',
-    primaryDark: '#070B14',
-    primarySoft: '#EDF0F5',
-    accent: '#D1232A',
-    accentDark: '#A41B21',
+    primary: '#0D242B',
+    primaryDark: '#08171C',
+    primarySoft: '#F0F8FA',
+    accent: '#DF131A',
+    accentDark: '#BA1015',
+    blue: '#00B3EA',
+    blueText: '#007AA0',
     bg: '#F5F6F8',
     surface: '#FFFFFF',
     ink: '#121720',
@@ -75,7 +96,7 @@ const theme: Theme = {
     onAccent: '#FFFFFF',
   },
   heroVariant: 'full-bleed',
-  logo: null,
+  logo: { src: '/brand/logo.png', alt: 'Premium Detailing' },
   radius: 0.75,
   shadow: '0 1px 2px rgb(12 18 32 / 0.08), 0 8px 24px rgb(12 18 32 / 0.06)',
 }

@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import Link from 'next/link'
 import { config } from '@/lib/config'
 import theme from '@/theme'
@@ -8,25 +9,29 @@ const NAV = [
   { href: '/', label: 'Home' },
   { href: '/services', label: 'Services' },
   { href: '/book', label: 'Book' },
+  { href: '/gallery', label: 'Work' },
   { href: '/about', label: 'About' },
   { href: '/contact', label: 'Contact' },
 ]
 
 /**
- * Dark header. A slim utility bar carries the hours line and the email, then
- * the main bar carries the wordmark, the nav, the phone and one accent button.
+ * Light header. The dark utility strip stays on top with the hours line and
+ * the email; the main bar is surface with a single hairline under it.
+ *
+ * The bar is light because the logo is drawn for white: its counters (the van
+ * windows, the boat deck lines) are background, so on a dark bar they read as
+ * holes. On white it reads as the client's actual printed logo.
  *
  * The hours line comes from config.hoursDisplay, the same single source the
  * footer and the contact page read. config.hours is NOT printed anywhere: it
  * mirrors the Google Business Profile for structured data only.
  */
-
 export default function Header() {
   const logo = theme.logo
   return (
-    <header className="sticky top-0 z-40 bg-primary-dark text-on-primary">
-      <div className="hidden border-b border-white/10 md:block">
-        <div className="mx-auto flex max-w-page items-center justify-between gap-4 px-4 py-2 text-xs text-on-primary/70 sm:px-6">
+    <header className="sticky top-0 z-40">
+      <div className="bg-primary-dark text-on-primary">
+        <div className="mx-auto hidden max-w-page items-center justify-between gap-4 px-4 py-2 text-xs text-on-primary/70 sm:px-6 md:flex">
           {config.hoursDisplay && <span>{config.hoursDisplay}</span>}
           {config.email && (
             <a href={`mailto:${config.email}`} className="hover:text-on-primary">
@@ -36,51 +41,59 @@ export default function Header() {
         </div>
       </div>
 
-      <div className="mx-auto flex max-w-page items-center justify-between gap-4 px-4 py-3 sm:px-6">
-        <Link href="/" className="flex items-center" aria-label={`${config.displayName} home`}>
-          {logo ? (
-            // Not run through the image pipeline on purpose: a wordmark must
-            // not be re-encoded. Fixed height, width auto, so it never shifts.
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={logo.src} alt={logo.alt} className="h-10 w-auto md:h-12" width={375} height={194} />
-          ) : (
-            <Wordmark />
-          )}
-        </Link>
+      <div className="border-b border-line bg-surface">
+        <div className="mx-auto flex max-w-page items-center justify-between gap-4 px-4 py-3 sm:px-6">
+          <Link href="/" className="flex items-center" aria-label={`${config.displayName} home`}>
+            {logo ? (
+              // Height driven, width auto, so the aspect ratio is the file's
+              // and the bar never shifts while it loads.
+              <Image
+                src={logo.src}
+                alt={logo.alt}
+                width={882}
+                height={465}
+                priority
+                className="h-11 w-auto lg:h-14"
+              />
+            ) : (
+              <Wordmark />
+            )}
+          </Link>
 
-        <nav aria-label="Main" className="hidden items-center gap-7 md:flex">
+          <nav aria-label="Main" className="hidden items-center gap-7 md:flex">
+            {NAV.map((item) => (
+              <Link key={item.href} href={item.href} className="text-sm font-semibold text-ink hover:text-accent">
+                {item.label}
+              </Link>
+            ))}
+          </nav>
+
+          <div className="flex items-center gap-3">
+            <Phone className="hidden text-sm font-semibold text-ink lg:inline" />
+            <Link
+              href="/book"
+              className="btn rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-on-accent hover:bg-accent-dark"
+            >
+              Book a Detail
+            </Link>
+          </div>
+        </div>
+
+        <nav
+          aria-label="Main mobile"
+          className="flex justify-center gap-5 overflow-x-auto border-t border-line px-4 py-2 md:hidden [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        >
           {NAV.map((item) => (
-            <Link key={item.href} href={item.href} className="text-sm font-semibold text-on-primary/85 hover:text-on-primary">
+            <Link
+              key={item.href}
+              href={item.href}
+              className="flex-shrink-0 whitespace-nowrap text-sm font-semibold text-ink hover:text-accent"
+            >
               {item.label}
             </Link>
           ))}
         </nav>
-
-        <div className="flex items-center gap-3">
-          <Phone className="hidden text-sm font-semibold text-on-primary lg:inline" />
-          <Link
-            href="/book"
-            className="btn rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-on-accent hover:bg-accent-dark"
-          >
-            Book a Detail
-          </Link>
-        </div>
       </div>
-
-      <nav
-        aria-label="Main mobile"
-        className="flex justify-center gap-5 overflow-x-auto border-t border-white/10 px-4 py-2 md:hidden [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-      >
-        {NAV.map((item) => (
-          <Link
-            key={item.href}
-            href={item.href}
-            className="flex-shrink-0 whitespace-nowrap text-sm font-semibold text-on-primary/85 hover:text-on-primary"
-          >
-            {item.label}
-          </Link>
-        ))}
-      </nav>
     </header>
   )
 }

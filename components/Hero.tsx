@@ -78,7 +78,7 @@ export default function Hero() {
     <section className="bg-bg">
       <div className="mx-auto grid max-w-page items-center gap-12 px-4 py-20 sm:px-6 md:grid-cols-5 md:py-28">
         <div className="md:col-span-3">
-          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-accent">{config.displayName}</p>
+          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-blue-text">{config.displayName}</p>
           <h1 className="mt-4 font-heading text-hero font-extrabold text-primary-dark">{h1}</h1>
           <p className="mt-6 max-w-xl text-lg text-muted md:text-xl">{config.tagline}</p>
           {cta(false)}

@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Image from 'next/image'
 import Credentials from '@/components/Credentials'
 import CtaBand from '@/components/CtaBand'
 import Img from '@/components/Img'
@@ -28,6 +29,15 @@ export default async function AboutPage() {
       <PageHeader title={`About ${config.displayName}`} intro={config.tagline} crumbs={CRUMBS} />
       <div className="mx-auto grid max-w-page gap-10 px-4 pt-10 sm:px-6 lg:grid-cols-3">
         <article className="lg:col-span-2">
+          <span className="mb-8 block rounded-site bg-surface p-5 ring-1 ring-line">
+            <Image
+              src="/brand/logo.png"
+              alt={`${config.displayName} logo`}
+              width={882}
+              height={465}
+              className="block h-auto w-[320px] max-w-full"
+            />
+          </span>
           <Credentials />
           {content}
         </article>

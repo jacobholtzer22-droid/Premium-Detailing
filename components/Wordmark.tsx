@@ -1,7 +1,9 @@
 import { config } from '@/lib/config'
 
 /**
- * The header wordmark, set as type.
+ * The header wordmark, set as type. FALLBACK ONLY: it renders when
+ * theme.logo is null. The header bar is light, so the two lines are ink and
+ * accent, both of which clear 4.5:1 on surface.
  *
  * The name is split on its first space so the two halves stack, which is what
  * gives a plain text name the weight to sit beside a photograph. Nothing is
@@ -17,7 +19,7 @@ export default function Wordmark() {
   return (
     <span className="flex flex-col leading-none">
       <span
-        className="font-heading font-extrabold uppercase text-on-primary"
+        className="font-heading font-extrabold uppercase text-ink"
         style={{ fontSize: '1.25rem', letterSpacing: '0.18em' }}
       >
         {top}

@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import BrandMark from './BrandMark'
 import { config } from '@/lib/config'
 
 /**
@@ -16,11 +17,14 @@ const STEPS = [
 export default function NextSteps() {
   return (
     <div className="mt-6 rounded-site border border-line bg-surface p-6 shadow-site">
-      <h2 className="font-heading text-lg font-bold text-primary-dark">What happens next</h2>
+      <h2 className="flex items-center gap-3 font-heading text-lg font-bold text-primary-dark">
+        <BrandMark size={40} />
+        What happens next
+      </h2>
       <ol className="mt-4 space-y-3">
         {STEPS.map((s, i) => (
           <li key={s} className="flex gap-3 text-sm leading-relaxed text-muted">
-            <span className="font-heading text-sm font-bold tabular-nums text-accent">{String(i + 1).padStart(2, '0')}</span>
+            <span className="font-heading text-sm font-bold tabular-nums text-blue-text">{String(i + 1).padStart(2, '0')}</span>
             {s}
           </li>
         ))}

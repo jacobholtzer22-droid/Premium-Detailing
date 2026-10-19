@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import Link from 'next/link'
 import { config, formatTime } from '@/lib/config'
 import Phone from './Phone'
@@ -22,13 +23,12 @@ export default function Footer() {
               file, and the footer is the one place it has the width to read.
               On a white chip because the artwork is drawn for light ground. */}
           <span className="mb-5 inline-block rounded-site bg-white p-3">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/brand/logo-on-white.png"
+            <Image
+              src="/brand/logo.png"
               alt={`${config.displayName} logo`}
-              width={200}
-              height={113}
-              className="block h-auto w-[200px]"
+              width={882}
+              height={465}
+              className="block h-auto w-[220px]"
             />
           </span>
           <p className="font-heading text-lg font-bold">{config.displayName}</p>

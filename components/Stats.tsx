@@ -58,7 +58,7 @@ function Stat({
   return (
     <div>
       <p
-        className={`font-heading font-extrabold tabular-nums text-on-primary ${
+        className={`font-heading font-extrabold tabular-nums text-blue ${
           big ? 'text-5xl md:text-6xl' : 'text-4xl'
         }`}
       >

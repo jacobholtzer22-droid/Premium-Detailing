@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import BrandMark from '@/components/BrandMark'
 import CtaBand from '@/components/CtaBand'
 import Phone from '@/components/Phone'
 import Reveal from '@/components/Reveal'
@@ -32,6 +33,10 @@ export default function BookPage() {
     <>
       <section className="bg-primary-dark text-on-primary">
         <div className="mx-auto max-w-page px-4 py-16 sm:px-6 md:py-20">
+          <p className="mb-4 flex items-center gap-3 text-sm font-semibold uppercase tracking-[0.2em] text-blue">
+            <BrandMark size={40} />
+            {config.displayName}
+          </p>
           <h1 className="font-heading text-hero font-extrabold">Book a Detail</h1>
           <p className="mt-5 max-w-2xl text-lg text-on-primary/85">
             Pick the package that fits your vehicle and grab a time. The detailing packages come to you, and every
