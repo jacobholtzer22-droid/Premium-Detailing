@@ -1,0 +1,29 @@
+# dependencies
+node_modules
+
+# next.js build output
+.next
+out
+
+# misc
+.DS_Store
+*.pem
+npm-debug.log*
+*.tsbuildinfo
+next-env.d.ts
+
+# local env files (this template needs none; nothing business-specific may live in env)
+.env*.local
+
+# vercel
+.vercel
+
+# Raw photo drops that are not yet in public/images/originals
+*.HEIC
+*.heic
+*.MOV
+*.mov
+*.mp4
+
+# local tooling
+.claude/

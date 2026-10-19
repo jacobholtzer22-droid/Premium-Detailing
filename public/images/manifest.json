@@ -1,0 +1,356 @@
+{
+  "alfa-wheel-red-caliper.jpg": {
+    "width": 3024,
+    "height": 4032,
+    "alt": "Black Alfa Romeo alloy wheel with a red brake caliper behind the spokes, on a white car",
+    "base": "alfa-wheel-red-caliper",
+    "sizes": [
+      640,
+      1024,
+      1920
+    ]
+  },
+  "black-bmw-x6-finished-on-pavers.jpg": {
+    "width": 4032,
+    "height": 2269,
+    "alt": "Finished black BMW X6 on a paver driveway, palm trees behind, paint reflecting the sky",
+    "base": "black-bmw-x6-finished-on-pavers",
+    "sizes": [
+      640,
+      1024,
+      1920
+    ]
+  },
+  "black-infiniti-q50-gloss-front.jpg": {
+    "width": 720,
+    "height": 960,
+    "alt": "Front corner of a black Infiniti Q50, trees reflected across the hood and chrome grille",
+    "base": "black-infiniti-q50-gloss-front",
+    "sizes": [
+      640
+    ]
+  },
+  "black-mercedes-cls-front-hood.jpg": {
+    "width": 3024,
+    "height": 2903,
+    "alt": "Black Mercedes CLS from the front, clouds mirrored across the hood and windshield, house behind",
+    "base": "black-mercedes-cls-front-hood",
+    "sizes": [
+      640,
+      1024,
+      1920
+    ]
+  },
+  "black-mercedes-cls-gloss-front-quarter.jpg": {
+    "width": 3024,
+    "height": 4032,
+    "alt": "Close front quarter of a black Mercedes CLS, clouds mirrored in the hood and front wing",
+    "base": "black-mercedes-cls-gloss-front-quarter",
+    "sizes": [
+      640,
+      1024,
+      1920
+    ]
+  },
+  "black-mercedes-cls-rear-quarter.jpg": {
+    "width": 3024,
+    "height": 4032,
+    "alt": "Rear quarter of a black Mercedes CLS on pavers, mirror finish along the flank and tail light",
+    "base": "black-mercedes-cls-rear-quarter",
+    "sizes": [
+      640,
+      1024,
+      1920
+    ]
+  },
+  "black-mustang-gloss-front-quarter.jpg": {
+    "width": 3024,
+    "height": 4032,
+    "alt": "Black Ford Mustang on red pavers, sunlight running along the polished front wing and wheel",
+    "base": "black-mustang-gloss-front-quarter",
+    "sizes": [
+      640,
+      1024,
+      1920
+    ]
+  },
+  "black-ram-truck-garage-hex-lights.jpg": {
+    "width": 1191,
+    "height": 1588,
+    "alt": "Black Ram pickup inside a garage under hexagon LED wall lighting, roller door open to trees",
+    "base": "black-ram-truck-garage-hex-lights",
+    "sizes": [
+      640,
+      1024
+    ]
+  },
+  "black-range-rover-grille-close.jpg": {
+    "width": 3024,
+    "height": 4032,
+    "alt": "Close front corner of a black Range Rover, lettering and mesh grille sharp against polished paint",
+    "base": "black-range-rover-grille-close",
+    "sizes": [
+      640,
+      1024,
+      1920
+    ]
+  },
+  "black-range-rover-sport-front.jpg": {
+    "width": 3024,
+    "height": 1702,
+    "alt": "Black Range Rover Sport head on at the roadside, trees mirrored across the bonnet and grille",
+    "base": "black-range-rover-sport-front",
+    "sizes": [
+      640,
+      1024,
+      1920
+    ]
+  },
+  "black-santa-fe-gloss-side.jpg": {
+    "width": 720,
+    "height": 960,
+    "alt": "Black Hyundai Santa Fe in profile on red pavers, bodywork reflecting the brickwork beneath it",
+    "base": "black-santa-fe-gloss-side",
+    "sizes": [
+      640
+    ]
+  },
+  "blue-lancer-evo-front-quarter.jpg": {
+    "width": 720,
+    "height": 960,
+    "alt": "Bright blue Mitsubishi Lancer Evolution angled on a concrete driveway in front of a garage door",
+    "base": "blue-lancer-evo-front-quarter",
+    "sizes": [
+      640
+    ]
+  },
+  "blue-tesla-model-s-driveway.jpg": {
+    "width": 4032,
+    "height": 3024,
+    "alt": "Deep blue Tesla Model S facing camera on a paver driveway in front of white garage doors",
+    "base": "blue-tesla-model-s-driveway",
+    "sizes": [
+      640,
+      1024,
+      1920
+    ]
+  },
+  "bmw-m4-foam-wash-mobile-van.jpg": {
+    "width": 3025,
+    "height": 3024,
+    "alt": "Black BMW M4 covered head to toe in pale blue foam, with the detailing van parked behind it",
+    "base": "bmw-m4-foam-wash-mobile-van",
+    "sizes": [
+      640,
+      1024,
+      1920
+    ]
+  },
+  "detail-brush-cleaning-red-door-panel.jpg": {
+    "width": 2160,
+    "height": 3840,
+    "alt": "Detail brush working foam across a red and black door panel inside a car during interior cleaning",
+    "base": "detail-brush-cleaning-red-door-panel",
+    "sizes": [
+      640,
+      1024,
+      1920
+    ]
+  },
+  "detailer-polishing-lifted-truck-driveway.jpg": {
+    "width": 960,
+    "height": 720,
+    "alt": "Detailer hand polishing the side of a lifted black Ford pickup on a paver driveway beside a house",
+    "base": "detailer-polishing-lifted-truck-driveway",
+    "sizes": [
+      640
+    ]
+  },
+  "grey-bmw-3-series-front-driveway.jpg": {
+    "width": 3024,
+    "height": 4032,
+    "alt": "Grey BMW 3 Series head on in a residential driveway, hood reflecting the house and garden behind",
+    "base": "grey-bmw-3-series-front-driveway",
+    "sizes": [
+      640,
+      1024,
+      1920
+    ]
+  },
+  "hot-water-extraction-cloth-seat.jpg": {
+    "width": 2160,
+    "height": 3840,
+    "alt": "Hot water extraction tool pulling dirty water out of a grey cloth car seat during an interior clean",
+    "base": "hot-water-extraction-cloth-seat",
+    "sizes": [
+      640,
+      1024,
+      1920
+    ]
+  },
+  "orange-lamborghini-huracan-driveway.jpg": {
+    "width": 696,
+    "height": 1020,
+    "alt": "Bronze orange Lamborghini Huracan parked on a residential driveway, palm trees and blue sky behind",
+    "base": "orange-lamborghini-huracan-driveway",
+    "sizes": [
+      640
+    ]
+  },
+  "pickup-truck-interior-dash-finished.jpg": {
+    "width": 720,
+    "height": 960,
+    "alt": "Finished pickup truck cabin: steering wheel, dash and two tone leather seat photographed from the passenger side",
+    "base": "pickup-truck-interior-dash-finished",
+    "sizes": [
+      640
+    ]
+  },
+  "porsche-cayenne-red-leather-interior.jpg": {
+    "width": 960,
+    "height": 960,
+    "alt": "Red leather Porsche Cayenne interior with the door open, showing seat, dash and sill after detailing",
+    "base": "porsche-cayenne-red-leather-interior",
+    "sizes": [
+      640
+    ]
+  },
+  "porsche-wheel-close-up.jpg": {
+    "width": 3024,
+    "height": 4032,
+    "alt": "Close up of a polished Porsche alloy wheel and fresh tyre on grey asphalt",
+    "base": "porsche-wheel-close-up",
+    "sizes": [
+      640,
+      1024,
+      1920
+    ]
+  },
+  "red-ferrari-foam-wash-bay.jpg": {
+    "width": 639,
+    "height": 1480,
+    "alt": "Red Ferrari covered in white foam in a wash bay, foam lance held against the front bumper",
+    "base": "red-ferrari-foam-wash-bay",
+    "sizes": [
+      639
+    ]
+  },
+  "red-motorcycle-fender-gloss.jpg": {
+    "width": 3024,
+    "height": 4032,
+    "alt": "Deep red motorcycle rear fender and chrome saddlebag trim, polished to a mirror in a garage",
+    "base": "red-motorcycle-fender-gloss",
+    "sizes": [
+      640,
+      1024,
+      1920
+    ]
+  },
+  "red-touring-motorcycle-polished-garage.jpg": {
+    "width": 3347,
+    "height": 3024,
+    "alt": "Red and silver touring motorcycle on a stand in a garage, tank, seat and saddlebags polished",
+    "base": "red-touring-motorcycle-polished-garage",
+    "sizes": [
+      640,
+      1024,
+      1920
+    ]
+  },
+  "silver-coupe-garage-hex-lights.jpg": {
+    "width": 2900,
+    "height": 1597,
+    "alt": "Silver Lexus convertible, rear three-quarter, parked in a garage under hexagon LED lighting on a flake floor",
+    "base": "silver-coupe-garage-hex-lights",
+    "sizes": [
+      640,
+      1024,
+      1920
+    ]
+  },
+  "vw-wheel-cleaned-on-pavers.jpg": {
+    "width": 3024,
+    "height": 4032,
+    "alt": "Cleaned Volkswagen alloy wheel and tyre photographed close on a paver driveway after a detail",
+    "base": "vw-wheel-cleaned-on-pavers",
+    "sizes": [
+      640,
+      1024,
+      1920
+    ]
+  },
+  "white-alfa-giulia-front-grille.jpg": {
+    "width": 3024,
+    "height": 4032,
+    "alt": "White Alfa Romeo Giulia photographed head on, badge and shield grille clean against the paint",
+    "base": "white-alfa-giulia-front-grille",
+    "sizes": [
+      640,
+      1024,
+      1920
+    ]
+  },
+  "white-alfa-giulia-side-profile.jpg": {
+    "width": 3024,
+    "height": 4032,
+    "alt": "White Alfa Romeo Giulia in profile on a driveway, black wheels, clean glass and trim",
+    "base": "white-alfa-giulia-side-profile",
+    "sizes": [
+      640,
+      1024,
+      1920
+    ]
+  },
+  "white-bmw-x3-dark-tinted-glass.jpg": {
+    "width": 3024,
+    "height": 4032,
+    "alt": "White BMW X3 on a paver drive, its dark tinted side and rear glass against the pale paintwork",
+    "base": "white-bmw-x3-dark-tinted-glass",
+    "sizes": [
+      640,
+      1024,
+      1920
+    ]
+  },
+  "white-camry-driveway-palms.jpg": {
+    "width": 765,
+    "height": 1020,
+    "alt": "White Toyota Camry on a paver driveway with palm trees and a tile roof behind it",
+    "base": "white-camry-driveway-palms",
+    "sizes": [
+      640
+    ]
+  },
+  "white-lamborghini-red-wheels-driveway.jpg": {
+    "width": 1284,
+    "height": 723,
+    "alt": "White Lamborghini Huracan with red wheels parked on a driveway beside a fence at dusk",
+    "base": "white-lamborghini-red-wheels-driveway",
+    "sizes": [
+      640,
+      1024
+    ]
+  },
+  "white-porsche-cayenne-front.jpg": {
+    "width": 3024,
+    "height": 4032,
+    "alt": "White Porsche Cayenne photographed head on in a driveway, palms and clouds mirrored in the hood",
+    "base": "white-porsche-cayenne-front",
+    "sizes": [
+      640,
+      1024,
+      1920
+    ]
+  },
+  "white-porsche-cayenne-side.jpg": {
+    "width": 3024,
+    "height": 4032,
+    "alt": "White Porsche Cayenne front quarter on a street, paint and glass finished and reflecting the sky",
+    "base": "white-porsche-cayenne-side",
+    "sizes": [
+      640,
+      1024,
+      1920
+    ]
+  }
+}
