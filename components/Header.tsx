@@ -74,7 +74,7 @@ export default function Header() {
             {/* Desktop only. On a phone the bar is already carrying a logo, a
                 nav row and a booking button; a fourth element turns it into a
                 list of things to ignore. */}
-            {config.reviewRating !== null && config.combinedReviewLabel !== null && (
+            {config.reviewRating !== null && config.reviewClaimTotal !== null && (
               <Link
                 href="/reviews"
                 className="hidden items-center gap-1.5 rounded-full border border-line px-3 py-1.5 text-xs font-semibold text-ink hover:border-accent lg:inline-flex"
@@ -83,7 +83,10 @@ export default function Header() {
                   <path d="M12 2.6l2.94 5.96 6.58.96-4.76 4.64 1.12 6.55L12 17.62l-5.88 3.09 1.12-6.55L2.48 9.52l6.58-.96z" />
                 </svg>
                 {config.reviewRating.toFixed(1)}
-                <span className="font-medium text-muted">{config.combinedReviewLabel} reviews</span>
+                <span aria-hidden="true" className="font-medium text-muted">
+                  &middot;
+                </span>
+                <span className="font-medium text-muted">{config.reviewClaimTotal} reviews</span>
               </Link>
             )}
             <Link

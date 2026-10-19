@@ -67,9 +67,7 @@ export default function HeroChecks({ className = '' }: { className?: string }) {
 
   const proof: Item[] = []
   if (config.reviewRating !== null) proof.push({ label: `${config.reviewRating.toFixed(1)} stars on Google` })
-  if (config.combinedReviewLabel !== null) {
-    proof.push({ label: `${config.combinedReviewLabel} five-star reviews across Google and Facebook`, href: '/reviews' })
-  }
+  if (config.reviewClaimLine !== null) proof.push({ label: config.reviewClaimLine, href: '/reviews' })
   if (config.foundingYear !== null) proof.push({ label: `Detailing since ${config.foundingYear}` })
   proof.push({ label: 'Trusted by local dealerships' })
 

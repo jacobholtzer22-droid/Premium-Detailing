@@ -397,6 +397,21 @@ export const siteConfigSchema = z
     reviewLink: z.string().url().nullable().default(null),
 
     /**
+     * The total the OWNER claims, and where he says it comes from. Both are
+     * his words, which is why they are two authored strings rather than
+     * anything derived.
+     *
+     * This sits beside reviewCountExact and facebookReviewCount, it does not
+     * replace them. The claim is what the headline surfaces print; the two
+     * counted figures are what the rating bar and the stats strip print, and
+     * the reviews page prints both so a visitor can see which part of the
+     * number is verified on this site and which part is the owner's word.
+     * Never fold the claim into a count, and never emit it as schema.
+     */
+    reviewClaimTotal: z.string().min(2).nullable().default(null),
+    reviewClaimScope: z.string().min(4).nullable().default(null),
+
+    /**
      * Visible testimonials with NO schema attached. Used when the reviews are
      * the business's own Google reviews, which Google treats as self-serving
      * when a site marks them up itself.
@@ -540,13 +555,16 @@ export type SiteConfig = SiteConfigParsed & {
   /** What the business does, for H1s and titles. tradeName, else services[0].name. */
   tradeLabel: string
   /**
-   * Google plus Facebook, floored to the nearest hundred, or null when neither
-   * count is set. Floored rather than rounded so the published figure is never
-   * larger than the counts behind it.
+   * "1,000+ five-star reviews across Google and social media", or null when
+   * the owner has made no claim. The ONE place that sentence is assembled, so
+   * the five surfaces that print it cannot drift apart.
+   *
+   * This replaced a derived figure that floored the two counted totals to the
+   * nearest hundred. The owner has since stated the real total across all his
+   * platforms, and his number outranks arithmetic done over the two platforms
+   * this site happens to be able to count.
    */
-  combinedReviewCount: number | null
-  /** "700+", or null. The ONE place that figure becomes text. */
-  combinedReviewLabel: string | null
+  reviewClaimLine: string | null
 }
 
 /**
@@ -567,15 +585,13 @@ export function formatPhoneDisplay(e164: string): string {
 export function deriveConfig(parsed: SiteConfigParsed): SiteConfig {
   const primaryService = parsed.services[0]
   if (!primaryService) throw new Error('services must have at least one entry')
-  const counted = (parsed.reviewCountExact ?? 0) + (parsed.facebookReviewCount ?? 0)
-  const combinedReviewCount =
-    parsed.reviewCountExact === null && parsed.facebookReviewCount === null ? null : Math.floor(counted / 100) * 100
+  const { reviewClaimTotal, reviewClaimScope } = parsed
   return {
     ...parsed,
     phoneDisplay: formatPhoneDisplay(parsed.phone),
     primaryService,
     tradeLabel: parsed.tradeName ?? primaryService.name,
-    combinedReviewCount,
-    combinedReviewLabel: combinedReviewCount ? `${formatPrice(combinedReviewCount)}+` : null,
+    reviewClaimLine:
+      reviewClaimTotal && reviewClaimScope ? `${reviewClaimTotal} five-star reviews ${reviewClaimScope}` : null,
   }
 }

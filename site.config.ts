@@ -323,11 +323,17 @@ const config: SiteConfigInput = {
   // visibly through `testimonials` instead, with no schema attached.
   reviews: [],
 
-  // Counted, with the date each was counted. The owner says 1,000+ across all
-  // platforms; 739 is what can be verified today, so the site publishes the
-  // floor of that (700+) and the exact counts sit beside it. Raising the
-  // figure needs links to wherever the rest are, which is question 1 on the
-  // client follow-up list.
+  // Two different things, deliberately kept apart.
+  //
+  // The claim is the owner's, stated 2026-10-19: 1,000+ across all of his
+  // platforms. It is what the headline surfaces print, in his words.
+  //
+  // The counts are what this site can verify, each with the date it was read.
+  // They are what the rating bar, the stats strip and the reviews page print,
+  // so a visitor can always see which part of the number has receipts.
+  // Never fold one into the other.
+  reviewClaimTotal: '1,000+',
+  reviewClaimScope: 'across Google and social media',
   reviewCountExact: 449,
   reviewCountAsOf: '2026-10-18',
   facebookReviewCount: 290,
@@ -409,11 +415,18 @@ const config: SiteConfigInput = {
       name: 'Sarah H.',
     },
     // Anthony D.'s review is HELD OUT, not lost. It ends a clause with "taken
-    // care of." and verify check 18 flags any "of." as the signature of a
-    // blank {config.*} interpolation. The check is correct to be strict and is
-    // not ours to loosen on a client site, and the alternative was editing a
-    // customer's words, so the quote sits here instead of on the page. Say the
-    // word and it goes back, either edited or with the template rule widened.
+    // care of." and verify check 18 reads any "of." as the signature of a
+    // blank {config.*} interpolation. That is a template bug, logged in
+    // TEMPLATE-ISSUES.md at the repo root; it is not ours to patch from a
+    // client site, and the alternative was editing a customer's words. Once
+    // the rule is fixed in AA-Template and pulled down, paste the quote back
+    // untouched:
+    //
+    //   quote: 'Kris came out with his team and did a fabulous job on both
+    //   cars, they did a Clay bar and took out the dog hair and made sure that
+    //   the paint was waxed and taken care of. Extremely satisfied with the
+    //   work that was done today. Thank you guys!'
+    //   name: 'Anthony D.'
     {
       quote:
         'I just got my side-by-side clean by them and it looks immaculate. I’m putting it up for sale and I just wanted to make it look brand new and that’s exactly what this company did. Very satisfied with the work that was done!',

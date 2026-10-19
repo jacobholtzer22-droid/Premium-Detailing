@@ -117,7 +117,14 @@ export default function InstagramFeed() {
         <ul className="no-scrollbar mt-10 flex snap-x snap-mandatory gap-5 overflow-x-auto pb-2 md:grid md:grid-cols-2 md:overflow-visible lg:grid-cols-3">
           {posts.map((post, i) => (
             <li key={post.url} className="w-[85%] flex-shrink-0 snap-start md:w-auto">
-              <div className="relative mx-auto aspect-[9/16] w-full max-w-[304px] overflow-hidden rounded-site border border-line bg-primary-soft">
+              {/*
+                A 9/16 box capped at 640px tall, so max-width is 640 * 9 / 16 =
+                360. It was 540/304, which was shorter than Instagram's own
+                embed chrome plus a vertical video: every tile clipped its
+                bottom edge and some cut the player in half. 640 clears the
+                tallest of the six.
+              */}
+              <div className="relative mx-auto aspect-[9/16] w-full max-w-[360px] overflow-hidden rounded-site border border-line bg-primary-soft">
                 <div
                   ref={(el) => {
                     hosts.current[i] = el

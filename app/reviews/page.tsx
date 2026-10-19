@@ -44,6 +44,21 @@ export default function ReviewsPage() {
   const { reviewRating, reviewCountExact, facebookReviewCount, reviewLink, profiles } = config
   const facebookReviews = profiles.facebook ? `${profiles.facebook}/reviews` : null
 
+  // The owner's claim, then the part of it this site can show receipts for.
+  // Assembled here rather than inline so the sentence is one string that can
+  // be read, and so a missing count drops its clause instead of leaving a
+  // dangling "and" or a stray full stop.
+  const verified = [
+    reviewCountExact !== null ? `${formatPrice(reviewCountExact)} on Google` : null,
+    facebookReviewCount !== null ? `${formatPrice(facebookReviewCount)} on Facebook` : null,
+  ].filter((x): x is string => x !== null)
+  const subline = [
+    config.reviewClaimLine ? `${config.reviewClaimLine}.` : null,
+    verified.length > 0 ? `${verified.join(' and ')} ${verified.length > 1 ? 'are' : 'is'} verified below.` : null,
+  ]
+    .filter((x): x is string => x !== null)
+    .join(' ')
+
   return (
     <>
       <JsonLd data={breadcrumbList(CRUMBS)} />
@@ -57,11 +72,9 @@ export default function ReviewsPage() {
               <p className="font-heading text-2xl font-bold text-primary-dark">{reviewRating.toFixed(1)} on Google</p>
             )}
           </div>
-          <p className="mt-3 max-w-2xl text-base leading-relaxed text-muted">
-            {reviewCountExact !== null && `${formatPrice(reviewCountExact)} five-star reviews on Google`}
-            {reviewCountExact !== null && facebookReviewCount !== null && ' and '}
-            {facebookReviewCount !== null && `${formatPrice(facebookReviewCount)} on Facebook`}
-            {'. The quotes below are copied word for word, with first names and last initials as they were left.'}
+          {subline && <p className="mt-3 max-w-2xl text-base leading-relaxed text-muted">{subline}</p>}
+          <p className="mt-2 max-w-2xl text-sm text-muted">
+            The quotes below are copied word for word, with first names and last initials as they were left.
           </p>
           <p className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm font-semibold">
             {profiles.gbp && (

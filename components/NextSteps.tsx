@@ -38,9 +38,9 @@ export default function NextSteps() {
           Book a Detail
         </Link>
       </div>
-      {config.combinedReviewLabel !== null && (
+      {config.reviewClaimLine !== null && (
         <p className="mt-6 border-t border-line pt-5 text-sm text-muted">
-          {config.combinedReviewLabel} five-star reviews across Google and Facebook.{' '}
+          {config.reviewClaimLine}.{' '}
           <Link href="/reviews" className="font-semibold text-primary underline-offset-4 hover:underline">
             Read them
           </Link>

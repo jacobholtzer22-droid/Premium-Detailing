@@ -81,11 +81,7 @@ export default function Testimonials({
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <h2 className="font-heading text-3xl font-bold text-primary-dark md:text-4xl">{heading}</h2>
-            {config.combinedReviewLabel && (
-              <p className="mt-2 text-base text-muted">
-                {config.combinedReviewLabel} five-star reviews across Google and Facebook
-              </p>
-            )}
+            {config.reviewClaimLine && <p className="mt-2 text-base text-muted">{config.reviewClaimLine}</p>}
           </div>
           <div className="flex gap-2">
             {arrow(-1, atStart)}
