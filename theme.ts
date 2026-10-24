@@ -102,7 +102,11 @@ const theme: Theme = {
     onAccent: '#FFFFFF',
     star: '#F4B400',
   },
-  heroVariant: 'full-bleed',
+  // 'split' rather than 'full-bleed': the hero photograph is now the client's
+  // Lamborghini Urus, and the only wide crop of it that keeps both cars is
+  // 1.85:1, which a phone's 0.59:1 hero box cuts down to a slice of house and
+  // palm. Portrait beside the copy shows the whole car at every width.
+  heroVariant: 'split',
   logo: { src: '/brand/logo.png', alt: 'Premium Detailing' },
   radius: 0.75,
   shadow: '0 1px 2px rgb(12 18 32 / 0.08), 0 8px 24px rgb(12 18 32 / 0.06)',

@@ -309,6 +309,17 @@
       1920
     ]
   },
+  "gold-lamborghini-urus-hero.jpg": {
+    "width": 2400,
+    "height": 1298,
+    "alt": "Gold Lamborghini Urus on a paver driveway after a wash, with a green Lamborghini Huracan parked behind it",
+    "base": "gold-lamborghini-urus-hero",
+    "sizes": [
+      640,
+      1024,
+      1920
+    ]
+  },
   "gold-lamborghini-urus-rear-quarter.jpg": {
     "width": 1800,
     "height": 2400,

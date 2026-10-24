@@ -74,21 +74,35 @@ export default function Hero() {
     )
   }
 
+  /*
+   * Split hero. The photograph comes FIRST in the DOM so a phone sees the car
+   * before it reads anything, and `order` puts it back on the right from md
+   * up. At lg the row stretches and the photo box takes the full row height,
+   * which is the text column's height, so the two sides finish level instead
+   * of leaving the car floating beside a taller block of copy. Below lg the
+   * photo keeps its own 3/4 ratio rather than being squeezed into a shape the
+   * file is not.
+   */
   return (
     <section className="bg-bg">
-      <div className="mx-auto grid max-w-page items-center gap-12 px-4 py-20 sm:px-6 md:grid-cols-5 md:py-28">
-        <div className="md:col-span-3">
+      <div className="mx-auto grid max-w-page items-center gap-12 px-4 py-20 sm:px-6 md:grid-cols-5 md:py-28 lg:items-stretch">
+        {hero && (
+          <div className="overflow-hidden rounded-site shadow-site md:order-2 md:col-span-2">
+            <Img
+              name={hero}
+              priority
+              sizes="(min-width: 768px) 40vw, 100vw"
+              className="aspect-[3/4] h-full w-full object-cover lg:aspect-auto"
+            />
+          </div>
+        )}
+        <div className="md:order-1 md:col-span-3 lg:self-center">
           <p className="text-sm font-semibold uppercase tracking-[0.2em] text-blue-text">{config.displayName}</p>
           <h1 className="mt-4 font-heading text-hero font-extrabold text-primary-dark">{h1}</h1>
           <p className="mt-6 max-w-xl text-lg text-muted md:text-xl">{config.tagline}</p>
           {cta(false)}
           <HeroChecks className="mt-10" />
         </div>
-        {hero && (
-          <div className="overflow-hidden rounded-site shadow-site md:col-span-2">
-            <Img name={hero} priority sizes="(min-width: 768px) 40vw, 100vw" className="aspect-[4/5] h-auto w-full object-cover" />
-          </div>
-        )}
       </div>
     </section>
   )

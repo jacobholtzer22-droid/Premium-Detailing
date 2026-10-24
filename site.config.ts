@@ -594,7 +594,16 @@ const config: SiteConfigInput = {
   ],
 
   images: {
-    hero: 'silver-coupe-garage-hex-lights.jpg',
+    // [owner] wants an exotic as the first thing on the site.
+    //
+    // The portrait rear quarter, with theme.heroVariant 'split'. The wide crop
+    // of the same wash (gold-lamborghini-urus-hero.jpg, still in originals)
+    // was built and rejected: the full-bleed hero box is 0.59:1 on a 390px
+    // phone while that crop is 1.85:1, so object-cover throws away 68% of its
+    // width and the phone render showed a house, a palm frond and a sliver of
+    // roofline. An exotic nobody can see on a phone is not an exotic hero.
+    // To go back to it: this line, plus heroVariant in theme.ts.
+    hero: 'gold-lamborghini-urus-rear-quarter.jpg',
     about: 'detailer-polishing-lifted-truck-driveway.jpg',
     gallery: [
       { name: 'gold-lamborghini-urus-driveway-wash.jpg', tag: 'process' },
@@ -602,6 +611,10 @@ const config: SiteConfigInput = {
       { name: 'red-mercedes-maybach-gls-driveway.jpg', tag: 'exterior' },
       { name: 'satin-black-audi-rs6-hood-open.jpg', tag: 'exterior' },
       { name: 'black-porsche-macan-shop-hex-lights.jpg', tag: 'coatings' },
+      // Was the hero until the owner asked for an exotic first. It is one of
+      // the best shop shots there is, so it moves into the gallery rather than
+      // out of the site.
+      { name: 'silver-coupe-garage-hex-lights.jpg', tag: 'coatings' },
       { name: 'mercedes-amg-gle-red-leather-interior.jpg', tag: 'interior' },
       { name: 'bmw-x5-wheel-red-caliper-close.jpg', tag: 'wheels' },
       { name: 'blue-cadillac-escalade-esv-front-quarter.jpg', tag: 'exterior' },
