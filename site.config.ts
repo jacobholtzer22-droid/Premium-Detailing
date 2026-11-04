@@ -12,9 +12,11 @@ import type { SiteConfigInput } from '@/lib/config-schema'
  * anything read off the old site.
  */
 const config: SiteConfigInput = {
-  // PLACEHOLDER. Swap for the real platform slug at launch, then redeploy.
-  // Until this is a real Business row, every lead from this site is lost.
-  businessSlug: 'replace-before-launch',
+  // The live platform slug. Confirmed against
+  // GET /api/verify-slug?slug=premium-detailing -> 200 {"ok":true}, which is
+  // also what verify check 3 asks. ContactFormGate sees a real slug here and
+  // stops disabling the form.
+  businessSlug: 'premium-detailing',
 
   legalName: 'Premium Detailing',
   displayName: 'Premium Detailing',
@@ -690,8 +692,25 @@ const config: SiteConfigInput = {
     submitLabel: 'Get My Quote',
   },
 
-  // Flip prelaunch to false at launch, then redeploy.
-  prelaunch: true,
+  // Launched 2026-11-04. app/robots.ts and app/layout.tsx read this one;
+  // launch.indexable below is the same fact in the field the ops platform
+  // reads, and the schema refuses to parse if the two ever disagree.
+  prelaunch: false,
+
+  launch: {
+    indexable: true,
+  },
+
+  // Google Ads. The two labels are the send_to values Google issued for this
+  // account's form and call conversion actions. No booking label: there is no
+  // /book conversion action yet.
+  tracking: {
+    googleAdsId: 'AW-16605866957',
+    conversions: {
+      form: 'AW-16605866957/qXB7CObCmLIdEM3Xpe49',
+      call: 'AW-16605866957/q5n6CMaDkLIdEM3Xpe49',
+    },
+  },
 
   domain: 'https://www.premiumdetailingpsl.com',
 }

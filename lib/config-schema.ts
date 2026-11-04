@@ -372,6 +372,55 @@ export const siteConfigSchema = z
     prelaunch: z.boolean().default(false),
 
     /**
+     * Ported from AA-Template, which replaced `prelaunch` with this block.
+     *
+     * This repo predates that change and its robots.ts and layout.tsx still
+     * read `prelaunch`, so the two are NOT redundant: `launch.indexable` is
+     * what the ops platform reads to report whether a site is live, and the
+     * superRefine below makes the pair contradict-proof. Flipping one without
+     * the other is a Zod failure, not a silently half-launched site.
+     */
+    launch: z.object({
+      indexable: z.boolean(),
+    }),
+
+    /**
+     * Google tag. OPTIONAL: omit the block and nothing renders, so a site
+     * without it is byte-identical to before it existed.
+     *
+     * With googleAdsId set, every page loads gtag.js and configs that id (and
+     * ga4 when set). conversions.form fires when the contact form shows its
+     * thank-you; conversions.call fires on a click of any tel: link. Each
+     * label is the "send_to" value Google Ads gives for the conversion
+     * action: the same AW- id, a slash, then the label. A missing label means
+     * that conversion is not fired.
+     */
+    tracking: z
+      .object({
+        googleAdsId: z.string().regex(/^AW-\d{6,12}$/, 'must look like AW-1234567890').optional(),
+        conversions: z
+          .object({
+            form: z.string().regex(/^AW-\d{6,12}\/[\w-]+$/, 'must look like AW-1234567890/AbCdEfGh').optional(),
+            call: z.string().regex(/^AW-\d{6,12}\/[\w-]+$/, 'must look like AW-1234567890/AbCdEfGh').optional(),
+          })
+          .strict()
+          .default({}),
+        ga4: z.string().regex(/^G-[A-Z0-9]{4,14}$/, 'must look like G-ABC123DEF4').optional(),
+      })
+      .strict()
+      .superRefine((t, ctx) => {
+        for (const key of ['form', 'call'] as const) {
+          const label = t.conversions[key]
+          if (!label) continue
+          if (!t.googleAdsId) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['conversions', key], message: 'needs tracking.googleAdsId' })
+          else if (!label.startsWith(`${t.googleAdsId}/`)) {
+            ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['conversions', key], message: `must start with ${t.googleAdsId}/` })
+          }
+        }
+      })
+      .optional(),
+
+    /**
      * Visible-only review figures. These render as words in copy and in the
      * stats strip. They NEVER feed aggregateRating schema; `reviews` above is
      * the only thing that does, and it stays empty when the visible section is
@@ -526,6 +575,17 @@ export const siteConfigSchema = z
   })
   .strict()
   .superRefine((cfg, ctx) => {
+    // The two launch flags are the same fact written twice (this repo's own
+    // code reads `prelaunch`, the ops platform reads `launch.indexable`), so
+    // disagreement is always a mistake and never a state worth having.
+    if (cfg.prelaunch === cfg.launch.indexable) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['launch', 'indexable'],
+        message: `launch.indexable must be the opposite of prelaunch (prelaunch is ${cfg.prelaunch})`,
+      })
+    }
+
     // Footage with no poster would leave the hero blank until the clip
     // decodes, and would leave check 19 with nothing to measure.
     if (cfg.images.heroVideo && !cfg.images.hero) {

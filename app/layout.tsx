@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import type { CSSProperties, ReactNode } from 'react'
 import Footer from '@/components/Footer'
+import GoogleTag from '@/components/GoogleTag'
 import Header from '@/components/Header'
 import MobileCallBar from '@/components/MobileCallBar'
 import { config } from '@/lib/config'
@@ -88,6 +89,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         </main>
         <Footer />
         <MobileCallBar />
+        <GoogleTag />
       </body>
     </html>
   )
