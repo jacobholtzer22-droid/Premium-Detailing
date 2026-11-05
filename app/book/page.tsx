@@ -18,6 +18,17 @@ export const metadata: Metadata = buildMetadata({
 }).metadata
 
 /**
+ * The owner's GoHighLevel service menu: one widget listing every bookable
+ * package with its own calendar behind it. GHL owns the calendar, the
+ * confirmations and the owner alerts; this page only hosts the iframe.
+ * form_embed.js resizes the iframe to its content via postMessage, and the
+ * inline min-height keeps the calendar usable if that script is blocked.
+ * Plain tags from a server component, for the same reason as GoogleTag.tsx.
+ */
+const SERVICE_MENU_ID = '6aea34dcdcb45ce8d22148d3'
+const SERVICE_MENU_URL = `https://api.leadconnectorhq.com/widget/service-menu/${SERVICE_MENU_ID}`
+
+/**
  * The booking page.
  *
  * This is the ONE place on the site that renders a dollar sign for every
@@ -87,14 +98,46 @@ export default function BookPage() {
           </p>
           <h1 className="font-heading text-hero font-extrabold">Book a Detail</h1>
           <p className="mt-5 max-w-2xl text-lg text-on-primary/85">
-            The detailing packages come to you and can be booked straight from here. Coating, film, correction and tint
-            are done at the shop and quoted per vehicle, so those take a quote request instead.
+            Pick a package and a time below and you are on the calendar. Nothing to pay when you book. The detailing
+            packages come to you; film, correction and tint are done at the shop and quoted per vehicle, so those take a
+            quote request instead.
           </p>
         </div>
       </section>
 
-      <section className="mx-auto max-w-page px-4 py-16 sm:px-6 md:py-24">
-        <ul className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+      <section id="calendar" className="mx-auto max-w-page px-4 py-16 sm:px-6 md:py-24">
+        <h2 className="font-heading text-2xl font-bold text-primary-dark">Pick a package and a time</h2>
+        <p className="mt-3 max-w-2xl text-base leading-relaxed text-muted">
+          You get a confirmation by email and text as soon as you book, and we text before the appointment to confirm
+          the address.
+        </p>
+        <div className="mt-8 overflow-hidden rounded-site border border-line bg-surface shadow-site">
+          <iframe
+            src={SERVICE_MENU_URL}
+            title="Book a detailing package"
+            id={`${SERVICE_MENU_ID}_booking`}
+            allow="payment"
+            scrolling="no"
+            style={{ width: '100%', minHeight: '900px', border: 'none', overflow: 'hidden' }}
+          />
+        </div>
+        <p className="mt-4 text-sm text-muted">
+          Calendar not loading?{' '}
+          <a href={SERVICE_MENU_URL} target="_blank" rel="noopener noreferrer" className="font-semibold text-primary-dark underline">
+            Open it in a new tab
+          </a>
+          , or call <Phone className="font-semibold text-primary-dark" />.
+        </p>
+        <script async src="https://link.msgsndr.com/js/form_embed.js" />
+      </section>
+
+      <section className="mx-auto max-w-page px-4 pb-16 sm:px-6 md:pb-24">
+        <h2 className="font-heading text-2xl font-bold text-primary-dark">Packages and starting prices</h2>
+        <p className="mt-3 max-w-2xl text-base leading-relaxed text-muted">
+          What each package covers and where the price starts. The final quote depends on the size and condition of the
+          vehicle.
+        </p>
+        <ul className="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
           {items.map((c, i) => (
             <li key={c.key} className="flex">
               <Reveal delay={Math.min((i % 3) * 60, 360)} className="w-full">

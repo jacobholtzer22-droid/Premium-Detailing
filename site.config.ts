@@ -92,7 +92,7 @@ const config: SiteConfigInput = {
             'Interior vacuum',
             'Full interior wipe down',
           ],
-          bookingUrl: 'https://api.leadconnectorhq.com/widget/booking/KfMx0UuW6ZhHpIRgeqLe',
+          bookingUrl: 'https://api.leadconnectorhq.com/widget/bookings/psl-bronze-package',
         },
         {
           name: 'Silver Package',
@@ -105,7 +105,7 @@ const config: SiteConfigInput = {
             'Exterior wax over the paint',
             'Light interior detail',
           ],
-          bookingUrl: 'https://api.leadconnectorhq.com/widget/booking/K4lPRLc5picjsYtGzs39',
+          bookingUrl: 'https://api.leadconnectorhq.com/widget/bookings/psl-silver-package',
         },
         {
           name: 'Gold Package',
@@ -120,7 +120,7 @@ const config: SiteConfigInput = {
             'Odor removal',
             'Our protection blend, at least forty-five days',
           ],
-          bookingUrl: 'https://api.leadconnectorhq.com/widget/booking/5EXJwsToTNOyza8OKOB0',
+          bookingUrl: 'https://api.leadconnectorhq.com/widget/bookings/psl-gold-package',
         },
       ],
       faqs: [
@@ -157,7 +157,7 @@ const config: SiteConfigInput = {
         'A durable coating that adds gloss, resists chemicals and makes a car far easier to wash, with packages running up to five years.',
       priceFrom: 750,
       priceNote: 'Starting price for the coating; paint correction is quoted separately after a paint evaluation.',
-      bookingUrl: 'https://api.leadconnectorhq.com/widget/booking/bY1BbL4jeSiarEogmqIz',
+      bookingUrl: 'https://api.leadconnectorhq.com/widget/bookings/psl-ceramic-coating',
       comingSoon: false,
       image: 'black-porsche-macan-shop-hex-lights.jpg',
       faqs: [
