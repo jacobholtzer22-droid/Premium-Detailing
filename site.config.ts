@@ -705,10 +705,10 @@ const config: SiteConfigInput = {
   // account's form and call conversion actions. No booking label: there is no
   // /book conversion action yet.
   tracking: {
-    googleAdsId: 'AW-16605866957',
+    googleAdsId: 'AW-696214868',
     conversions: {
-      form: 'AW-16605866957/qXB7CObCmLIdEM3Xpe49',
-      call: 'AW-16605866957/q5n6CMaDkLIdEM3Xpe49',
+      form: 'AW-696214868/W60bCJ_zirQdENTK_csC',
+      call: 'AW-696214868/BfqqCNrpirQdENTK_csC',
     },
   },
 
