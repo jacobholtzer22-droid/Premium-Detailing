@@ -1,0 +1,713 @@
+name: AA build
+
+# Fills or updates this client site with Claude Code, runs the verify gate, and
+# opens a PR for review. Vercel previews the PR; a human merges it.
+#
+# Dispatched by the platform ops tool (repository_dispatch, type aa-build) or by
+# hand from the Actions tab (workflow_dispatch).
+#
+# The agent commits to the build branch but never pushes — see AGENT.md,
+# "Non-interactive (CI) mode". This workflow owns the push, the PR and the
+# callback, so that the branch, the PR body and the platform all describe the
+# same commit.
+#
+# The gate runs as its own step with continue-on-error, because a red gate must
+# still produce a branch, a PR and a report. A failed build that reports why is
+# reviewable; a failed build that vanishes is not.
+
+on:
+  repository_dispatch:
+    types: [aa-build]
+  workflow_dispatch:
+    inputs:
+      kind:
+        description: 'site_build (new site from BRIEF.md), site_update (scoped change from INSTRUCTIONS.md), or go_live (flip launch.indexable to true)'
+        type: choice
+        required: true
+        default: site_build
+        options:
+          - site_build
+          - site_update
+          - go_live
+      run_id:
+        description: 'Ops run id, echoed back in the callback'
+        type: string
+        required: true
+      brief:
+        description: 'base64 of the BRIEF.md markdown (site_build)'
+        type: string
+        required: false
+        default: ''
+      instructions:
+        description: 'base64 of the INSTRUCTIONS.md markdown (site_update)'
+        type: string
+        required: false
+        default: ''
+      business_slug:
+        description: 'businessSlug, must match the Business row on the platform'
+        type: string
+        required: true
+      callback_url:
+        description: 'Platform URL to POST the result to'
+        type: string
+        required: false
+        default: ''
+      assets:
+        description: 'base64 of a JSON list of client files [{url, kind, filename, caption, heroCandidate, service, beforeAfter}] (site_build, site_update)'
+        type: string
+        required: false
+        default: ''
+      old_site:
+        description: 'base64 of JSON {url, use: verbatim | facts_only | ignore, notes}'
+        type: string
+        required: false
+        default: ''
+      with_stock:
+        description: '"true" when Jacob said to build with stock photos (no client photos on file)'
+        type: string
+        required: false
+        default: ''
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  # One build at a time per repo. A second dispatch waits rather than racing the
+  # first one's branch and PR.
+  group: aa-build-${{ github.repository }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    # Every commit this job makes is authored by Jacob's own GitHub identity
+    # (his users.noreply address). Vercel on this plan refuses to deploy a
+    # commit whose author is not a member of the team ("@aa-build must be a
+    # member of the team to deploy"), so a bot author means no preview.
+    env:
+      BUILD_AUTHOR_NAME: Jacob Holtzer
+      BUILD_AUTHOR_EMAIL: 251882806+jacobholtzer22-droid@users.noreply.github.com
+
+    steps:
+      # ---------------------------------------------------------------------
+      # Inputs arrive under github.event.inputs (workflow_dispatch) or
+      # github.event.client_payload (repository_dispatch). Normalise once here
+      # so no later step has to care which trigger fired.
+      # ---------------------------------------------------------------------
+      - name: Resolve inputs
+        id: cfg
+        env:
+          KIND: ${{ github.event.inputs.kind || github.event.client_payload.kind }}
+          RUN_ID: ${{ github.event.inputs.run_id || github.event.client_payload.run_id }}
+          BRIEF_B64: ${{ github.event.inputs.brief || github.event.client_payload.brief }}
+          INSTRUCTIONS_B64: ${{ github.event.inputs.instructions || github.event.client_payload.instructions }}
+          BUSINESS_SLUG: ${{ github.event.inputs.business_slug || github.event.client_payload.business_slug }}
+          CALLBACK_URL: ${{ github.event.inputs.callback_url || github.event.client_payload.callback_url }}
+        run: |
+          set -euo pipefail
+
+          kind="${KIND:-site_build}"
+          case "$kind" in
+            site_build|site_update|go_live) ;;
+            *) echo "::error::kind must be site_build, site_update or go_live, got '$kind'"; exit 1 ;;
+          esac
+
+          if [ -z "${BUSINESS_SLUG:-}" ]; then
+            echo "::error::business_slug is required. It is the join key for every lead this site sends; a build without it cannot be verified."
+            exit 1
+          fi
+          if ! printf '%s' "$BUSINESS_SLUG" | grep -Eq '^[a-z0-9]+(-[a-z0-9]+)*$'; then
+            echo "::error::business_slug '$BUSINESS_SLUG' is not kebab-case; site.config.ts would fail schema validation."
+            exit 1
+          fi
+          if [ -z "${RUN_ID:-}" ]; then
+            echo "::error::run_id is required so the callback can be matched to an ops run."
+            exit 1
+          fi
+
+          if [ "$kind" = "site_build" ] && [ -z "${BRIEF_B64:-}" ]; then
+            echo "::error::kind=site_build requires a base64 brief."
+            exit 1
+          fi
+          if [ "$kind" = "site_update" ] && [ -z "${INSTRUCTIONS_B64:-}" ]; then
+            echo "::error::kind=site_update requires base64 instructions."
+            exit 1
+          fi
+
+          # run_id goes in a branch name, so keep it to safe characters.
+          short_run_id="$(printf '%s' "$RUN_ID" | tr -cd '[:alnum:]-' | cut -c1-12)"
+          if [ -z "$short_run_id" ]; then
+            echo "::error::run_id '$RUN_ID' has no alphanumeric characters to build a branch name from."
+            exit 1
+          fi
+
+          {
+            echo "kind=$kind"
+            echo "run_id=$RUN_ID"
+            echo "business_slug=$BUSINESS_SLUG"
+            echo "callback_url=${CALLBACK_URL:-}"
+            echo "branch=build/${BUSINESS_SLUG}-${short_run_id}"
+          } >> "$GITHUB_OUTPUT"
+
+          echo "kind=$kind  slug=$BUSINESS_SLUG  branch=build/${BUSINESS_SLUG}-${short_run_id}"
+
+      - name: Preflight secrets
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          OPS_CALLBACK_SECRET: ${{ secrets.OPS_CALLBACK_SECRET }}
+        run: |
+          set -euo pipefail
+          missing=0
+          if [ -z "${ANTHROPIC_API_KEY:-}" ]; then
+            echo "::error::Repository secret ANTHROPIC_API_KEY is not set. Add it under Settings > Secrets and variables > Actions. Without it Claude Code cannot run and this job can only fail."
+            missing=1
+          fi
+          if [ -z "${OPS_CALLBACK_SECRET:-}" ]; then
+            echo "::error::Repository secret OPS_CALLBACK_SECRET is not set. Add it under Settings > Secrets and variables > Actions. It signs the result callback; without it the platform cannot trust the report and would never record this run."
+            missing=1
+          fi
+          [ "$missing" -eq 0 ] || exit 1
+          echo "Both required secrets are present."
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # Full history: the agent commits, and the push below needs a real
+          # branch, not a detached shallow clone.
+          fetch-depth: 0
+
+      - name: Node version
+        id: node
+        # Client repos made from the template before .nvmrc existed have no
+        # such file, and setup-node fails hard on a missing node-version-file.
+        # Read it when present, otherwise use 20 (package.json engines >=20).
+        run: |
+          if [ -f .nvmrc ]; then v="$(tr -d '[:space:]' < .nvmrc)"; else v=20; fi
+          echo "version=${v:-20}" >> "$GITHUB_OUTPUT"
+          echo "Node ${v:-20}"
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ steps.node.outputs.version }}
+          cache: npm
+
+      - name: Commit identity
+        run: |
+          git config user.name  "$BUILD_AUTHOR_NAME"
+          git config user.email "$BUILD_AUTHOR_EMAIL"
+
+      - name: Install dependencies
+        # tsx, cheerio and sharp are devDependencies and the gate needs all
+        # three, so this is a full install. Never --omit=dev here.
+        run: npm ci
+
+      - name: Write the brief
+        env:
+          BRIEF_B64: ${{ github.event.inputs.brief || github.event.client_payload.brief }}
+          INSTRUCTIONS_B64: ${{ github.event.inputs.instructions || github.event.client_payload.instructions }}
+          KIND: ${{ steps.cfg.outputs.kind }}
+        run: |
+          set -euo pipefail
+          case "$KIND" in
+            site_build)
+              printf '%s' "$BRIEF_B64" | base64 -d > BRIEF.md
+              test -s BRIEF.md || { echo "::error::decoded BRIEF.md is empty"; exit 1; }
+              echo "Wrote BRIEF.md ($(wc -c < BRIEF.md) bytes, $(wc -l < BRIEF.md) lines)"
+              ;;
+            site_update)
+              printf '%s' "$INSTRUCTIONS_B64" | base64 -d > INSTRUCTIONS.md
+              test -s INSTRUCTIONS.md || { echo "::error::decoded INSTRUCTIONS.md is empty"; exit 1; }
+              echo "Wrote INSTRUCTIONS.md ($(wc -c < INSTRUCTIONS.md) bytes, $(wc -l < INSTRUCTIONS.md) lines)"
+              ;;
+            go_live)
+              # Written HERE, not taken from the payload, and any supplied
+              # `instructions` is ignored on purpose. go_live is the one run
+              # that may publish a site, so its scope is fixed in this file
+              # rather than in a dispatch field someone could widen.
+              # Two generations of the template are in the field and their
+              # launch flags read in OPPOSITE directions: the current one asks
+              # whether the site may be indexed, the older one asked whether it
+              # is still pre-launch. Naming both, with the value each one needs,
+              # is what keeps a go_live run from confidently setting the wrong
+              # boolean and either leaving a launched site noindexed or
+              # publishing one that was meant to stay hidden.
+              cat > INSTRUCTIONS.md <<'EOF'
+          # Go live
+
+          If `site.config.ts` has `launch.indexable`, set it to `true`.
+          Otherwise if it has `prelaunch`, set it to `false`.
+
+          Change nothing else. Do not touch content, design, images,
+          components, or any other config field. Then run the gate and report.
+
+          The two flags mean opposite things, so take the value from whichever
+          key this repo actually has and do not add the other one. If neither
+          key is present, stop and say so in BUILD-REPORT.md rather than
+          guessing which generation this repo is.
+          EOF
+              echo "Wrote the canonical go_live INSTRUCTIONS.md:"
+              sed 's/^/    /' INSTRUCTIONS.md
+              ;;
+          esac
+
+      # ---------------------------------------------------------------------
+      # Client files from the ops intake. Downloaded here, not by the agent,
+      # so what lands in the repo is exactly the list Jacob filed: only
+      # public Vercel Blob URLs, 20 MB each, clean kebab-case names. ASSETS.json
+      # maps each saved file to its caption, hero flag, service and before/after;
+      # OLD-SITE.json says whether to copy the old site. Both are inputs the
+      # agent reads and never edits (AGENT.md, Non-interactive (CI) mode).
+      # Once one real photo is in, the template's sample-* placeholders go.
+      # ---------------------------------------------------------------------
+      - name: Fetch client files
+        if: steps.cfg.outputs.kind != 'go_live'
+        env:
+          ASSETS_B64: ${{ github.event.inputs.assets || github.event.client_payload.assets }}
+          OLD_SITE_B64: ${{ github.event.inputs.old_site || github.event.client_payload.old_site }}
+        run: |
+          set -euo pipefail
+          if [ -n "${OLD_SITE_B64:-}" ]; then
+            printf '%s' "$OLD_SITE_B64" | base64 -d > OLD-SITE.json
+            echo "Wrote OLD-SITE.json: $(cat OLD-SITE.json)"
+          fi
+          if [ -z "${ASSETS_B64:-}" ]; then
+            echo "No client files in the payload."
+            exit 0
+          fi
+          printf '%s' "$ASSETS_B64" | base64 -d > "$RUNNER_TEMP/assets-in.json"
+          node - "$RUNNER_TEMP/assets-in.json" <<'NODE'
+          const fs = require('node:fs')
+          const path = require('node:path')
+          const { execFileSync } = require('node:child_process')
+          const list = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'))
+          const dir = 'public/images/originals'
+          fs.mkdirSync(dir, { recursive: true })
+          const kebab = (s) => String(s || '').toLowerCase().replace(/\.[a-z0-9]+$/, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60)
+          const used = new Set()
+          const saved = []
+          const skipped = []
+          for (const a of list) {
+            let host = ''
+            try { host = new URL(a.url).hostname } catch {}
+            if (!host.endsWith('.public.blob.vercel-storage.com')) { skipped.push({ ...a, why: 'not a Vercel Blob URL' }); continue }
+            if (a.kind === 'document') { skipped.push({ ...a, why: 'documents are not placed on the site' }); continue }
+            const ext = (path.extname(new URL(a.url).pathname) || '.jpg').toLowerCase()
+            let base = (a.kind === 'logo' ? 'logo' : '') || kebab(a.caption) || kebab(a.filename) || 'photo'
+            let name = base + ext
+            for (let n = 2; used.has(name); n++) name = `${base}-${n}${ext}`
+            used.add(name)
+            const file = path.join(dir, name)
+            try {
+              execFileSync('curl', ['-fsSL', '--max-filesize', String(20 * 1024 * 1024), '-o', file, a.url], { stdio: 'inherit' })
+              saved.push({ file: path.join('public/images/originals', name), kind: a.kind, caption: a.caption, heroCandidate: Boolean(a.heroCandidate), service: a.service, beforeAfter: a.beforeAfter, source: a.filename })
+            } catch (e) {
+              skipped.push({ ...a, why: 'download failed' })
+            }
+          }
+          fs.writeFileSync('ASSETS.json', JSON.stringify({ saved, skipped }, null, 2) + '\n')
+          const photos = saved.filter((s) => s.kind === 'photo').length
+          console.log(`Saved ${saved.length} file(s) (${photos} photo(s)), skipped ${skipped.length}.`)
+          if (photos > 0) {
+            for (const f of fs.readdirSync(dir)) if (f.startsWith('sample-')) fs.rmSync(path.join(dir, f))
+            console.log('Removed the sample-* placeholders from originals.')
+          }
+          NODE
+
+      # ---------------------------------------------------------------------
+      # Stock photos, only when Jacob said "with stock" and no client photo was
+      # saved above. Trade-matched photos searched from the services in
+      # BRIEF.md, from Pexels when PEXELS_API_KEY is set, else from Pixabay
+      # when PIXABAY_API_KEY is (both licenses allow commercial use without
+      # attribution; Pixabay's asks that files be downloaded and hosted, never
+      # hotlinked, which this does). Saved to public/images/originals/ as
+      # stock-*. Photos whose description or tags mention a person, a face, a
+      # logo, a truck or a van are skipped; the agent still views each one
+      # before placing it. STOCK.json lists every file so the agent marks them
+      # in CLIENT-TODO.md for real photos to replace. With neither key nothing
+      # is fetched and the site builds without images, as before.
+      # ---------------------------------------------------------------------
+      - name: Fetch stock photos
+        if: steps.cfg.outputs.kind == 'site_build'
+        env:
+          WITH_STOCK: ${{ github.event.inputs.with_stock || github.event.client_payload.with_stock }}
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+          PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
+        run: |
+          set -euo pipefail
+          if [ "${WITH_STOCK:-}" != "true" ]; then
+            echo "Not a stock build."
+            exit 0
+          fi
+          if [ -f ASSETS.json ] && [ "$(jq '[.saved[] | select(.kind == "photo")] | length' ASSETS.json)" != "0" ]; then
+            echo "Client photos are on file; no stock."
+            exit 0
+          fi
+          if [ -z "${PEXELS_API_KEY:-}" ] && [ -z "${PIXABAY_API_KEY:-}" ]; then
+            echo '{"saved":[],"skipped":"Neither PEXELS_API_KEY nor PIXABAY_API_KEY is set on this repo, so no stock photos were fetched."}' > STOCK.json
+            echo "::warning::with_stock requested but no stock API key is set; building without images."
+            exit 0
+          fi
+          node <<'NODE'
+          const fs = require('node:fs')
+          const path = require('node:path')
+          // One search interface over both providers: { id, text, page, download }.
+          const providers = {
+            Pexels: {
+              license: 'https://www.pexels.com/license/',
+              async search(q) {
+                const res = await fetch(`https://api.pexels.com/v1/search?query=${encodeURIComponent(q)}&per_page=15&orientation=landscape`, { headers: { Authorization: process.env.PEXELS_API_KEY } })
+                if (!res.ok) throw new Error(`Pexels HTTP ${res.status}`)
+                const { photos = [] } = await res.json()
+                return photos.map((p) => ({ id: p.id, text: p.alt || '', page: p.url, download: p.src.large2x }))
+              },
+            },
+            Pixabay: {
+              license: 'https://pixabay.com/service/license-summary/',
+              async search(q) {
+                const res = await fetch(`https://pixabay.com/api/?key=${encodeURIComponent(process.env.PIXABAY_API_KEY)}&q=${encodeURIComponent(q.slice(0, 100))}&image_type=photo&orientation=horizontal&safesearch=true&per_page=20`)
+                if (!res.ok) throw new Error(`Pixabay HTTP ${res.status}`)
+                const { hits = [] } = await res.json()
+                return hits.map((h) => ({ id: h.id, text: h.tags || '', page: h.pageURL, download: h.largeImageURL }))
+              },
+            },
+          }
+          const name = process.env.PEXELS_API_KEY ? 'Pexels' : 'Pixabay'
+          const provider = providers[name]
+          const brief = fs.readFileSync('BRIEF.md', 'utf8')
+          // Service names from the brief's "- Name:" lines; the trade as a fallback query.
+          const names = [...brief.matchAll(/^\s*-\s*Name:\s*(.+)$/gim)].map((m) => m[1].trim()).filter((n) => n && !/^unknown$/i.test(n))
+          const trade = (/Trade[^:]*:\s*(.+)/i.exec(brief)?.[1] ?? '').trim()
+          const queries = (names.length ? names : [trade]).filter(Boolean).slice(0, 6)
+          const banned = /\b(person|people|man|men|woman|women|girl|boy|child|face|portrait|smiling|worker|logo|brand|truck|van|uniform)\b/i
+          const kebab = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40)
+          const dir = 'public/images/originals'
+          fs.mkdirSync(dir, { recursive: true })
+          const saved = []
+          const skipped = []
+          const seen = new Set()
+          ;(async () => {
+            for (const [qi, q] of queries.entries()) {
+              let photos
+              try { photos = await provider.search(q) } catch (e) { skipped.push({ query: q, why: String(e.message || e) }); continue }
+              let taken = 0
+              for (const p of photos) {
+                if (taken >= (qi === 0 ? 3 : 2)) break
+                if (seen.has(p.id)) continue
+                if (banned.test(p.text)) { skipped.push({ query: q, id: p.id, why: `description mentions a person, logo or vehicle: ${p.text}` }); continue }
+                seen.add(p.id)
+                const file = path.join(dir, `stock-${kebab(q)}-${taken + 1}.jpg`)
+                const img = await fetch(p.download)
+                if (!img.ok) { skipped.push({ query: q, id: p.id, why: `download HTTP ${img.status}` }); continue }
+                fs.writeFileSync(file, Buffer.from(await img.arrayBuffer()))
+                saved.push({ file, service: names.length ? q : null, query: q, provider: name, sourceId: p.id, sourceUrl: p.page, description: p.text || null, heroCandidate: qi === 0 && taken === 0 })
+                taken++
+              }
+            }
+            fs.writeFileSync('STOCK.json', JSON.stringify({ source: name, license: provider.license, saved, skipped }, null, 2) + '\n')
+            if (saved.length) for (const f of fs.readdirSync(dir)) if (f.startsWith('sample-')) fs.rmSync(path.join(dir, f))
+            console.log(`Stock (${name}): saved ${saved.length} from ${queries.length} queries (${queries.join(', ')}), skipped ${skipped.length}.`)
+          })().catch((e) => { console.error(e); fs.writeFileSync('STOCK.json', JSON.stringify({ source: name, saved, skipped: [...skipped, { why: String(e) }] }, null, 2) + '\n') })
+          NODE
+
+      - name: Run Claude Code
+        id: claude
+        uses: anthropics/claude-code-action@v1
+        with:
+          # A `prompt` puts the action in automation mode: it runs immediately
+          # instead of waiting for an @claude mention.
+          prompt: 'Follow AGENT.md in non-interactive (CI) mode. kind=${{ steps.cfg.outputs.kind }}. businessSlug=${{ steps.cfg.outputs.business_slug }}.'
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          # The job's own token. Without it the action tries an OIDC exchange
+          # for the Claude GitHub App token, which needs `id-token: write` and
+          # the app installed on every client repo; neither is true.
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          # Print the agent's turns in the job log. Without it a failed run
+          # leaves only "is_error: true". The client repos are private, so the
+          # log is not public.
+          show_full_output: true
+          # AGENT.md has the agent run npm run build / verify and commit to the
+          # build branch, so it needs Bash. Pushing is the workflow's job (the
+          # push step below); an agent push would race it, so it is denied.
+          claude_args: |
+            --max-turns 180
+            --allowedTools "Bash,Read,Write,Edit,MultiEdit,Glob,Grep,LS,TodoWrite"
+            --disallowedTools "Bash(git push:*)"
+
+      - name: Verify gate
+        id: verify
+        # The gate decides whether this is mergeable, not whether the job
+        # reports. A red gate still gets a branch, a PR and a report.
+        continue-on-error: true
+        # Output goes to RUNNER_TEMP, never the working tree: these are job
+        # artifacts, and a stray file in the repo would end up in the commit.
+        # The pipeline is the LAST command in this step on purpose — with
+        # pipefail its status is the step's status, which is what sets
+        # steps.verify.outcome. Do not append anything after it.
+        run: |
+          set -o pipefail
+          npm run verify 2>&1 | tee "$RUNNER_TEMP/verify-output.txt"
+
+      - name: Collect gate result
+        id: gate
+        if: always()
+        run: |
+          set -euo pipefail
+          out="$RUNNER_TEMP/verify-output.txt"
+          table="$RUNNER_TEMP/verify-table.txt"
+
+          if [ "${{ steps.verify.outcome }}" = "success" ]; then
+            echo "verify_passed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "verify_passed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+          # The gate's own summary line is the authoritative list of failures.
+          failing=""
+          if [ -f "$out" ]; then
+            failing="$(grep -oE '^FAILED: .*' "$out" | head -1 | sed 's/^FAILED: //; s/\. Do not deploy\.$//' || true)"
+          fi
+          echo "failing_checks=${failing}" >> "$GITHUB_OUTPUT"
+          echo "Gate: ${{ steps.verify.outcome }}. Failing: ${failing:-none}"
+
+          # The table is the part worth reading; keep it for the PR body.
+          if [ -f "$out" ]; then
+            awk '/^#   check/,0' "$out" > "$table" || true
+            [ -s "$table" ] || tail -40 "$out" > "$table"
+          else
+            echo "npm run verify produced no output; the step did not reach the gate." > "$table"
+          fi
+
+      - name: Commit and push the build branch
+        id: push
+        if: always()
+        env:
+          BRANCH: ${{ steps.cfg.outputs.branch }}
+        run: |
+          set -euo pipefail
+          git config user.name  "$BUILD_AUTHOR_NAME"
+          git config user.email "$BUILD_AUTHOR_EMAIL"
+
+          # The agent was told to commit to build/<businessSlug>. Whatever it
+          # did or did not commit, everything in the tree belongs on this
+          # branch, so move onto it and sweep up the remainder.
+          git checkout -B "$BRANCH"
+
+          # BRIEF.md / INSTRUCTIONS.md are committed on purpose: the PR reviewer
+          # needs to see the input the site was built from. Gate output lives in
+          # RUNNER_TEMP and never reaches the working tree.
+          if [ -n "$(git status --porcelain)" ]; then
+            git add -A
+            git commit \
+              -m "build: ${{ steps.cfg.outputs.kind }} for ${{ steps.cfg.outputs.business_slug }}" \
+              -m "Ops run ${{ steps.cfg.outputs.run_id }}. Verify gate: ${{ steps.verify.outcome }}. See BUILD-REPORT.md." \
+              -m "Co-authored-by: aa-build <aa-build@users.noreply.github.com>"
+            echo "Committed the remaining working-tree changes."
+          else
+            echo "Working tree clean; the agent's own commits are all there is."
+          fi
+
+          # Vercel judges the commit at the branch head. If the agent made the
+          # last commit (claude-code-action authors as claude[bot]), add an
+          # empty one in Jacob's name so the preview is allowed to deploy.
+          if [ "$(git log -1 --format=%ae)" != "$BUILD_AUTHOR_EMAIL" ]; then
+            git commit --allow-empty \
+              -m "build: deploy ${{ steps.cfg.outputs.kind }} for ${{ steps.cfg.outputs.business_slug }}" \
+              -m "Empty commit so the branch head is authored by a Vercel team member." \
+              -m "Co-authored-by: aa-build <aa-build@users.noreply.github.com>"
+            echo "Added an empty commit authored by $BUILD_AUTHOR_NAME at the branch head."
+          fi
+
+          if git rev-parse --verify --quiet "origin/main" >/dev/null && \
+             [ "$(git rev-list --count origin/main.."$BRANCH")" = "0" ]; then
+            echo "::warning::No commits on $BRANCH beyond main. Claude Code produced no changes."
+            echo "empty=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "empty=false" >> "$GITHUB_OUTPUT"
+          fi
+
+          # Report the branch git actually pushed, never a name from the agent's report.
+          pushed="$(git rev-parse --abbrev-ref HEAD)"
+          git push --force-with-lease -u origin "$pushed"
+          echo "branch=$pushed" >> "$GITHUB_OUTPUT"
+          echo "Pushed $pushed at $(git rev-parse --short HEAD), head author $(git log -1 --format='%an <%ae>')"
+
+      - name: Open the pull request
+        id: pr
+        if: always() && steps.push.outputs.empty == 'false'
+        # Repos default to "Actions may not create pull requests", and this
+        # workflow cannot change that. When GitHub refuses, the job still
+        # succeeds and the callback carries pr_url null: the platform then
+        # opens the PR from the pushed branch with its own token.
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH: ${{ steps.push.outputs.branch }}
+          KIND: ${{ steps.cfg.outputs.kind }}
+          SLUG: ${{ steps.cfg.outputs.business_slug }}
+        run: |
+          set -euo pipefail
+
+          {
+            if [ -f BUILD-REPORT.md ]; then
+              cat BUILD-REPORT.md
+            else
+              echo "## No BUILD-REPORT.md"
+              echo
+              echo "AGENT.md Phase 7 requires one. Its absence means the agent did not reach Phase 7 —"
+              echo "check the Claude Code step's log before reading anything below as a finished build."
+            fi
+            echo
+            echo '---'
+            echo
+            echo '## Verify gate'
+            echo
+            echo "Result: **${{ steps.verify.outcome }}**"
+            if [ -n "${{ steps.gate.outputs.failing_checks }}" ]; then
+              echo
+              echo "Failing: ${{ steps.gate.outputs.failing_checks }}"
+            fi
+            echo
+            echo '```'
+            cat "$RUNNER_TEMP/verify-table.txt" 2>/dev/null || echo "(no verify output captured)"
+            echo '```'
+            echo
+            echo "Ops run \`${{ steps.cfg.outputs.run_id }}\` · workflow run [${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
+          } > "$RUNNER_TEMP/pr-body.md"
+
+          existing="$(gh pr list --head "$BRANCH" --state open --json url --jq '.[0].url // empty')"
+          if [ -n "$existing" ]; then
+            gh pr edit "$existing" --title "$KIND: $SLUG" --body-file "$RUNNER_TEMP/pr-body.md"
+            url="$existing"
+          else
+            url="$(gh pr create --base main --head "$BRANCH" --title "$KIND: $SLUG" --body-file "$RUNNER_TEMP/pr-body.md")"
+          fi
+          echo "pr_url=$url" >> "$GITHUB_OUTPUT"
+          echo "PR: $url"
+
+      - name: Upload the agent's output
+        # Kept even when an earlier step failed: the full transcript, the
+        # report and the stock list are what explain a bad run. Files that
+        # were never written are skipped.
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: aa-build-${{ steps.cfg.outputs.run_id || github.run_id }}
+          path: |
+            /home/runner/work/_temp/claude-execution-output.json
+            BUILD-REPORT.md
+            STOCK.json
+          if-no-files-found: ignore
+          retention-days: 14
+
+      - name: Call back to the platform
+        if: always()
+        env:
+          CALLBACK_URL: ${{ steps.cfg.outputs.callback_url }}
+          OPS_CALLBACK_SECRET: ${{ secrets.OPS_CALLBACK_SECRET }}
+          RUN_ID: ${{ steps.cfg.outputs.run_id }}
+          KIND: ${{ steps.cfg.outputs.kind }}
+          # What git pushed (the push step), falling back to the planned name only if the push never ran.
+          BRANCH: ${{ steps.push.outputs.branch || steps.cfg.outputs.branch }}
+          PR_URL: ${{ steps.pr.outputs.pr_url }}
+          VERIFY_PASSED: ${{ steps.gate.outputs.verify_passed }}
+          FAILING_CHECKS: ${{ steps.gate.outputs.failing_checks }}
+          JOB_STATUS: ${{ job.status }}
+          CLAUDE_OUTCOME: ${{ steps.claude.outcome }}
+          CLAUDE_OUTPUT: ${{ steps.claude.outputs.execution_file }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${CALLBACK_URL:-}" ]; then
+            echo "No callback_url supplied; nothing to report back to."
+            exit 0
+          fi
+
+          excerpt=""
+          if [ -f BUILD-REPORT.md ]; then
+            excerpt="$(head -60 BUILD-REPORT.md)"
+          else
+            excerpt="(no BUILD-REPORT.md was produced)"
+          fi
+
+          # On a failed run, the last 20 lines of the agent's final result, so
+          # the chief can say why it failed without opening the Actions log.
+          # -s and flatten read the file whether it is one JSON array or one
+          # message per line. A run that stopped without result text (max
+          # turns, say) reports its subtype instead.
+          failure_tail=""
+          if [ "$JOB_STATUS" != "success" ] || [ "${CLAUDE_OUTCOME:-}" = "failure" ]; then
+            out="${CLAUDE_OUTPUT:-$RUNNER_TEMP/claude-execution-output.json}"
+            [ -f "$out" ] || out="$RUNNER_TEMP/claude-execution-output.json"
+            if [ -f "$out" ]; then
+              failure_tail="$(jq -rs '
+                [flatten[] | select(type == "object" and .type == "result")] | last
+                | if . == null then empty
+                  elif ((.result // "") | length) > 0 then .result
+                  else "Claude stopped without a result (\(.subtype // "unknown"))" end
+              ' "$out" 2>/dev/null | tail -20 | head -c 4000 || true)"
+            fi
+          fi
+
+          # jq builds the JSON so every field is escaped properly; the report
+          # excerpt is markdown full of quotes, backticks and newlines.
+          jq -nc \
+            --arg run_id        "$RUN_ID" \
+            --arg kind          "$KIND" \
+            --arg status        "$JOB_STATUS" \
+            --arg branch        "$BRANCH" \
+            --arg pr_url        "${PR_URL:-}" \
+            --arg run_url       "$RUN_URL" \
+            --arg failing       "${FAILING_CHECKS:-}" \
+            --arg excerpt       "$excerpt" \
+            --arg failure_tail  "$failure_tail" \
+            --argjson verify_passed "${VERIFY_PASSED:-false}" \
+            '{
+               run_id: $run_id,
+               kind: $kind,
+               status: $status,
+               branch: $branch,
+               pr_url: (if $pr_url == "" then null else $pr_url end),
+               run_url: $run_url,
+               verify_passed: $verify_passed,
+               failing_checks: (if $failing == "" then [] else ($failing | split(", ")) end),
+               report_excerpt: $excerpt,
+               failure_tail: (if $failure_tail == "" then null else $failure_tail end)
+             }' > "$RUNNER_TEMP/callback.json"
+
+          # HMAC over the exact bytes being sent, so the platform can verify the
+          # body it received is the body this job signed.
+          sig="$(openssl dgst -sha256 -hmac "$OPS_CALLBACK_SECRET" -hex < "$RUNNER_TEMP/callback.json" | awk '{print $NF}')"
+
+          code="$(curl -sS -o "$RUNNER_TEMP/callback-response.txt" -w '%{http_code}' \
+            --max-time 30 --retry 3 --retry-connrefused \
+            -X POST "$CALLBACK_URL" \
+            -H 'Content-Type: application/json' \
+            -H "X-AA-Signature: $sig" \
+            --data-binary @"$RUNNER_TEMP/callback.json")"
+
+          echo "Callback POST $CALLBACK_URL -> HTTP $code"
+          head -c 500 "$RUNNER_TEMP/callback-response.txt" || true
+          echo
+          case "$code" in
+            2*) echo "Platform accepted the result." ;;
+            *)  echo "::warning::Callback returned HTTP $code. The branch and PR are still correct; the platform just did not record this run." ;;
+          esac
+
+      - name: Summary
+        if: always()
+        run: |
+          {
+            echo "### AA build: ${{ steps.cfg.outputs.kind }} / ${{ steps.cfg.outputs.business_slug }}"
+            echo
+            echo "| | |"
+            echo "|---|---|"
+            echo "| Gate | ${{ steps.verify.outcome }} |"
+            echo "| Failing checks | ${{ steps.gate.outputs.failing_checks || 'none' }} |"
+            echo "| Branch | \`${{ steps.cfg.outputs.branch }}\` |"
+            echo "| PR | ${{ steps.pr.outputs.pr_url || 'not opened' }} |"
+            echo "| Ops run | \`${{ steps.cfg.outputs.run_id }}\` |"
+          } >> "$GITHUB_STEP_SUMMARY"
