@@ -108,3 +108,48 @@ Then print, in this order:
 8. Anything you believe is wrong with the template itself.
 
 Do not summarize what you built. The verify output and the config are the report.
+
+Non-interactive (CI) mode
+This section applies when the build runs as a GitHub Actions job rather than in a terminal with a human watching. `.github/workflows/aa-build.yml` is the caller. Nothing here relaxes a rule; it only says which steps change shape when there is no one to look at a screenshot.
+
+Three kinds of run. The workflow passes exactly one.
+
+* `site_build` — a new site. Follow all of AGENT.md from Phase 1, reading `BRIEF.md`.
+* `site_update` — a change to a site that already exists. Read `INSTRUCTIONS.md` and do only what it asks. Do not re-run the phases that are already done, do not redesign, do not rewrite content the instructions did not name. Every absolute rule and every phase rule still binds whatever you touch: no invented facts, no facts typed into content, no hand-written JSON-LD, config stays the only home for business facts. The gate still runs and still has to pass.
+* `go_live` — the one run that may set `launch.indexable` to `true`, and the only exception to absolute rule 7. `INSTRUCTIONS.md` says exactly one thing and you do exactly that: set `launch.indexable` to `true` in `site.config.ts`, change nothing else, run the gate, report. Do not touch content, design, config facts, images or components. Do not "improve" anything you notice on the way past — if something is wrong, say so under item 8 and leave it. A `go_live` diff that touches more than that one boolean is wrong by construction, and the human reviewing the PR is checking the client approved a launch, not re-reviewing a site. Check 21 then expects no robots meta on any page and a normal `robots.txt` with the sitemap line; if the gate is red, the site does not go live.
+
+Tracking installs. A `site_update` whose `INSTRUCTIONS.md` contains a `tracking` block (the Google tag: `googleAdsId`, `conversions.form`, `conversions.call`, optionally `ga4`) is a tracking install, and it is as narrow as `go_live`: write that block into `site.config.ts` as the `tracking` key, exactly as given, and change nothing else. Do not touch content, components, images, other config fields or `launch.indexable`. The tag, the form conversion and the call conversion already render from the block (`components/GoogleTag.tsx`); check 22 then measures the built HTML against it. A tracking-install diff that touches any file but `site.config.ts` is wrong by construction. If a value in the block does not match the schema, stop and say so under item 8; never guess or reformat an id or a label.
+
+What changes in CI.
+
+* Phase 5 screenshots are skipped. There is no browser and no dev server. Run `npm run build` instead, and replace steps 2 and 3 with a written self-check: read your own `theme.ts`, the components you changed, and the MDX you wrote, then name the three things most likely to make this site read as templated, judged against the Phase 2d banned-pattern list and the Phase 2b direction you committed to. Be as specific as Phase 5 demands. Fix all three and say what you changed. "I could not see it so I could not tell" is not an answer; the banned-pattern list is checkable by reading the code.
+* Phase 7 is unchanged except that it matters more: `BUILD-REPORT.md` is the only output a human will read. Still commit to `build/<businessSlug>`. Still do not push, do not merge, do not deploy, do not open a pull request. The workflow pushes the branch and opens the PR; if you push, you race it.
+* The brief is an input, not a working file. `BRIEF.md` (or `INSTRUCTIONS.md`) is written by the workflow from the dispatch payload. Read it as many times as you like. Never edit it, never reformat it, never "correct" it, never delete it. If it contradicts itself or omits `businessSlug`, stop and say so in `BUILD-REPORT.md` — that is the signal the human needs, and silently patching the brief destroys it.
+
+Client files and the old site. The workflow writes these before you start; read them, never edit them.
+
+* `ASSETS.json` lists what it downloaded into `public/images/originals/` from the ops intake (`saved`) and what it could not (`skipped`), each with `kind` (`photo` or `logo`), `caption`, `heroCandidate`, `service` and `beforeAfter`. These are the client's own photographs; they lead the site. When at least one photo was saved, the workflow has already removed the `sample-*` placeholders from `originals/`. Remove every remaining `sample-*` file under `public/images/` and every reference to one, and no config field may point at a sample file.
+* Hero: the `heroCandidate` photo if there is one, judged by Phase 3; otherwise the finished-job photo with the fewest distractions. Reject a frame with a neighbor's house, a chain link fence, a meter, a readable house number, a car or a person in it. Hero alt text stays generic: no town, no business name.
+* A photo with a `service` goes to that service's `services[].image`. A service with no real photo gets `null`, never a sample or a borrowed image. The rest go to `images.gallery`, ordered with `after` photos first and `before` photos last. The `logo` file is the site logo.
+* Use each `caption` when you write that image's alt text in Phase 3, after viewing the image; the caption says which job and which town, the image says what is in the frame.
+* `OLD-SITE.json` (if present) is the client's old website and how to use it. `verbatim`: fetch it and carry its copy and page structure over, fixing typos, removing em dashes and keeping its SEO phrases; every business fact still goes through config. `facts_only`: read it only for services, service area, phone, hours and years in business, and write fresh copy. `ignore`: do not fetch it. Anything you take from it that the brief does not also state is reported under item 7 with the page it came from.
+* Write `CLIENT-TODO.md` listing every page or service that has no real photo, and anything else the client still owes. The human sends it to the client.
+* In `BUILD-REPORT.md`, name the hero photo you chose and why, and state how many photos from `ASSETS.json` you placed and how many you left out, with the reason for each one left out.
+
+Stock photos. `STOCK.json` exists only when Jacob asked for a stock build and the client sent no photos. Its `saved` files are in `public/images/originals/` as `stock-*`, each with the service it was searched for and one `heroCandidate`. View every one before placing it and reject any with a face, a logo, another company's truck or uniform, a neighbor's house, a meter or a readable house number. Place them the way client photos are placed (hero, each service's image, then the gallery), and they are the one exception to rule 2e's ban on stock. Every stock file you placed goes in `CLIENT-TODO.md` under "Stock photos to replace with real ones", by page. If `STOCK.json` has no `saved` files, build without images under rule 2e and quote its `skipped` reason in item 6 of the report. A stock site is a preview, never a go-live.
+
+Forbidden in CI, without exception. Each of these makes the gate pass while the thing it guards is broken, which is worse than a red build:
+
+* `npm run seal-contact-form`. It re-baselines the checksum to whatever the form currently is. In a client repo it does not fix check 4, it blinds it.
+* Editing `components/ContactForm.tsx` or `scripts/contact-form.sha256`.
+* Editing `lib/config-schema.ts`. The endpoint and honeypot constants live there and checks 5, 6 and 20 are measured against them.
+* Editing `lib/content.ts`. Removing `blockJS: false` makes every `{config.*}` in content render as an empty string with a green build.
+* Editing `next.config.mjs`. `output: 'export'` is what produces the `./out` the gate inspects.
+* Editing anything under `.github/`. The workflow does not edit itself.
+* Editing or weakening `scripts/verify.ts`, `scripts/verify-limits.ts`, `scripts/contrast-check.ts`, or `lib/hero-scrim.ts`.
+* Setting `launch.indexable` to `true` on a `site_build` or `site_update` run. Only `go_live` touches it.
+* Editing `app/robots.ts` or the `robots` block in `app/layout.tsx`. Both read the flag; the flag is the control surface, not the code.
+
+If a change you believe is correct requires one of these files, do not make it. Write what you wanted to change and why under item 8 of the report, and let the human decide in the template repo.
+
+Failure. Phase 6 still allows three `npm run verify` attempts. If the gate is still red after the third, stop. Do not try a fourth, do not disable a check, do not edit a check's thresholds, do not delete a content file to dodge one. Write into `BUILD-REPORT.md`: the full final verify table, every failing check number with its detail string, what you tried on each attempt, and what you believe the fix is. Then commit what you have to `build/<businessSlug>` and finish. A red branch with an honest report is a usable result; a green branch with a weakened gate is not.
