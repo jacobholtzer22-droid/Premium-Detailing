@@ -899,16 +899,13 @@ const config: SiteConfigInput = {
 
   // [flyra] read 2026-11-11 and [owner] 2026-11-08 update list.
   //
-  // techIds is EMPTY, which switches the whole booking flow off and falls every
-  // package back to a quote CTA. That is deliberate, not an oversight: the two
-  // Flyra employee ids for Evan Russo and Schuyler Clawson come from
-  // GET /employees, and FLYRA_API_KEY could not be read to make that call (it
-  // is present in Vercel Production but decrypts to an empty value, and it is
-  // absent from Preview entirely). Guessing an employee id would dispatch real
-  // jobs to nobody.
+  // techIds: Flyra employee ids for the two techs who take website bookings,
+  // Evan Russo and Schuyler Clawson, read from Flyra's employee list
+  // 2026-11-11. Empty switches the booking flow off and falls every package
+  // back to a quote CTA.
   //
-  // TO FINISH: put the key in Vercel for Production AND Preview, run
-  // GET /employees, paste the two ids here. Nothing else changes.
+  // FLYRA_API_KEY is a Vercel "sensitive" variable, so vercel env pull always
+  // shows it as an empty string; that does not mean it is empty at runtime.
   booking: {
     timezone: 'America/New_York',
     // Flyra's own minimum notice setting. The slot route never offers anything
@@ -916,7 +913,10 @@ const config: SiteConfigInput = {
     // a 20 minute-from-now slot has booked a job nobody can get to.
     minNoticeHours: 6,
     daysAhead: 7,
-    techIds: [],
+    techIds: [
+      'bed86eb2-ee52-4a18-a749-1b281904e024', // Evan Russo
+      'c8ab60c4-5199-4413-99b3-395207878149', // Schuyler Clawson
+    ],
     // Flyra deposits apply to estimates, not to a booked detail.
     depositRequired: false,
     notes: [
