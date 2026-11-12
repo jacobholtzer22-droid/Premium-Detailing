@@ -1,0 +1,1 @@
+Change only the three package prices on the site: Gold package $360, Silver package $260, Bronze package $160. Update every place those package prices appear (pricing section, any structured data or config that holds them). Change nothing else: no copy, layout, services, photos, or other prices. In your report, state the old and new price for each package and the files changed.
