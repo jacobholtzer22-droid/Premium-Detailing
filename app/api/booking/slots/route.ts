@@ -32,8 +32,14 @@ import {
 
 export const dynamic = 'force-dynamic'
 
-/** How many windows to ask Flyra for, per tech. Covers a week comfortably. */
-const SLOTS_PER_TECH = 80
+/**
+ * How many windows to ask Flyra for in one call. Flyra rejects anything over
+ * 20 (validation_error "expected number to be <=20"), so the week is fetched
+ * one day per call instead of one big call per tech.
+ */
+const SLOTS_PER_CALL = 16
+/** Flyra calls in flight at once, so a page load never bursts into a 429. */
+const CONCURRENCY = 4
 /** Most windows shown for any one day. Beyond this the strip is noise. */
 const MAX_PER_DAY = 14
 
@@ -49,6 +55,24 @@ function unavailable(packageSlug: string, packageName: string, durationMinutes: 
     available: false,
   }
   return NextResponse.json(body, { headers: { 'cache-control': 'no-store' } })
+}
+
+/** Runs async jobs with at most `limit` in flight, in input order. */
+async function runPool<T>(jobs: Array<() => Promise<T>>, limit: number): Promise<PromiseSettledResult<T>[]> {
+  const out: PromiseSettledResult<T>[] = new Array(jobs.length)
+  let next = 0
+  async function worker() {
+    while (next < jobs.length) {
+      const i = next++
+      try {
+        out[i] = { status: 'fulfilled', value: await jobs[i]!() }
+      } catch (reason) {
+        out[i] = { status: 'rejected', reason }
+      }
+    }
+  }
+  await Promise.all(Array.from({ length: Math.min(limit, jobs.length) }, worker))
+  return out
 }
 
 export async function GET(request: Request) {
@@ -84,28 +108,42 @@ export async function GET(request: Request) {
   const lastKey = addDaysToKey(requestedKey, settings.daysAhead - 1, tz)
   const windowEnd = startOfDayInZone(addDaysToKey(lastKey, 1, tz), tz)
 
-  // One call per tech, in parallel. A tech whose call fails is skipped rather
-  // than failing the request: one dead employee record must not empty the
-  // calendar for the other.
-  const results = await Promise.allSettled(
-    settings.techIds.map((techId) =>
-      findOpenSlots({
-        employeeId: techId,
-        durationMinutes: pkg.durationMinutes,
-        startAfter: toZonedIso(startAfter, tz),
-        slots: SLOTS_PER_TECH,
-      }),
-    ),
-  )
+  // One call per tech per day, a few at a time. A call that fails is skipped
+  // rather than failing the request: one dead employee record or one bad day
+  // must not empty the calendar for the rest.
+  const jobs: Array<() => ReturnType<typeof findOpenSlots>> = []
+  for (const key of dayKeys(requestedKey, settings.daysAhead, tz)) {
+    const dayStart = startOfDayInZone(key, tz)
+    const dayEnd = startOfDayInZone(addDaysToKey(key, 1, tz), tz)
+    const from = dayStart.getTime() > startAfter.getTime() ? dayStart : startAfter
+    if (from.getTime() >= dayEnd.getTime()) continue
+    for (const techId of settings.techIds) {
+      jobs.push(() =>
+        findOpenSlots({
+          employeeId: techId,
+          durationMinutes: pkg.durationMinutes,
+          startAfter: toZonedIso(from, tz),
+          slots: SLOTS_PER_CALL,
+        }),
+      )
+    }
+  }
+  const results = await runPool(jobs, CONCURRENCY)
 
   const failures = results.filter((r) => r.status === 'rejected')
-  if (failures.length === settings.techIds.length) {
+  if (results.length === 0 || failures.length === results.length) {
     // Nobody answered. Tell the page to show the phone number.
     const first = failures[0]
     if (first && first.status === 'rejected') {
-      console.error('[booking/slots] every tech lookup failed:', first.reason instanceof Error ? first.reason.message : first.reason)
+      console.error('[booking/slots] every slot lookup failed:', first.reason instanceof Error ? first.reason.message : first.reason)
     }
     return unavailable(pkg.slug, pkg.name, pkg.durationMinutes)
+  }
+  if (failures.length > 0) {
+    const first = failures[0]
+    if (first && first.status === 'rejected') {
+      console.error(`[booking/slots] ${failures.length}/${results.length} slot lookups failed:`, first.reason instanceof Error ? first.reason.message : first.reason)
+    }
   }
 
   // De-duplicate on the instant: two techs free at the same time is one window
