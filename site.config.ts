@@ -33,9 +33,9 @@ import type { SiteConfigInput } from '@/lib/config-schema'
  * [owner] 2026-11-08 update list.
  */
 const PKG = {
-  bronze: 150,
-  silver: 250,
-  gold: 350,
+  bronze: 160,
+  silver: 260,
+  gold: 360,
 } as const
 
 const ADDON = {

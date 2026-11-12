@@ -208,9 +208,9 @@ test('a package that is not bookable online resolves to null', () => {
 
 test('each bookable package carries the Flyra price-book name and its own duration', () => {
   const expected = [
-    ['mobile-detailing-bronze', 'Bronze Package', 45, 150],
-    ['mobile-detailing-silver', 'Silver Package', 60, 250],
-    ['mobile-detailing-gold', 'Gold Package', 120, 350],
+    ['mobile-detailing-bronze', 'Bronze Package', 45, 160],
+    ['mobile-detailing-silver', 'Silver Package', 60, 260],
+    ['mobile-detailing-gold', 'Gold Package', 120, 360],
   ] as const
   for (const [slug, flyraService, durationMinutes, priceFrom] of expected) {
     const pkg = getBookablePackage(slug)
