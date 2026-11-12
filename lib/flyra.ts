@@ -176,7 +176,7 @@ export function findOpenSlots(args: {
   slots?: number
   skipWeekends?: boolean
 }): Promise<FlyraSlotRaw[]> {
-  return request<FlyraSlotRaw[]>('/actions/flyra_find_open_slot', {
+  return request<unknown>('/actions/flyra_find_open_slot', {
     method: 'POST',
     body: {
       employee_id: args.employeeId,
@@ -185,7 +185,7 @@ export function findOpenSlots(args: {
       ...(args.slots ? { slots: args.slots } : {}),
       ...(args.skipWeekends === undefined ? {} : { skip_weekends: args.skipWeekends }),
     },
-  })
+  }).then(normalizeSlots)
 }
 
 export interface FlyraAvailability {
@@ -289,12 +289,47 @@ export function createJob(args: {
 }
 
 /** The start of a window, whichever of Flyra's three spellings it arrived as. */
+/**
+ * flyra_find_open_slot's response schema is only "the action's result", so
+ * the windows may come back as a bare array or wrapped in an object
+ * ({ slots: [...] }, { windows: [...] }, ...). Take the first array of objects
+ * that look like windows. Logs the shape (keys only, no values) when it is
+ * not a bare array, so the real field name is visible in the runtime logs.
+ */
+let loggedShape = false
+export function normalizeSlots(value: unknown): FlyraSlotRaw[] {
+  if (Array.isArray(value)) return value as FlyraSlotRaw[]
+  const looksLikeSlot = (x: unknown) =>
+    !!x && typeof x === 'object' && rawSlotStart(x as FlyraSlotRaw) !== null
+  const seen: unknown[] = []
+  const walk = (v: unknown, depth: number): FlyraSlotRaw[] | null => {
+    if (!v || typeof v !== 'object' || depth > 3 || seen.includes(v)) return null
+    seen.push(v)
+    if (Array.isArray(v)) return v.some(looksLikeSlot) ? (v as FlyraSlotRaw[]) : null
+    for (const child of Object.values(v as Record<string, unknown>)) {
+      const found = walk(child, depth + 1)
+      if (found) return found
+    }
+    return null
+  }
+  if (!loggedShape && value && typeof value === 'object') {
+    loggedShape = true
+    const top = Object.keys(value as Record<string, unknown>)
+    console.info('[flyra] find_open_slot result keys:', top.join(','))
+  }
+  return walk(value, 0) ?? []
+}
+
 export function rawSlotStart(slot: FlyraSlotRaw): string | null {
-  return slot.start ?? slot.start_time ?? slot.scheduled_start ?? null
+  const x = slot as FlyraSlotRaw & Record<string, unknown>
+  const v = x.start ?? x.start_time ?? x.scheduled_start ?? x.starts_at ?? x.start_at ?? x.from
+  return typeof v === 'string' ? v : null
 }
 
 export function rawSlotEnd(slot: FlyraSlotRaw): string | null {
-  return slot.end ?? slot.end_time ?? slot.scheduled_end ?? null
+  const x = slot as FlyraSlotRaw & Record<string, unknown>
+  const v = x.end ?? x.end_time ?? x.scheduled_end ?? x.ends_at ?? x.end_at ?? x.to
+  return typeof v === 'string' ? v : null
 }
 
 /** The job id, whichever spelling Flyra used. */
