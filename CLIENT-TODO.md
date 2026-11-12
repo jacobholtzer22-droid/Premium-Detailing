@@ -4,13 +4,60 @@ Nothing on the site was invented. Every answer below is a gap the site is
 currently working around, and each one makes a specific part of the site
 better or turns a placeholder into the real thing.
 
+Updated 2026-11-11 against your 8 November list. The shop address question is
+answered and done: 2190 NW Reserve Park Trace, Suite 14 is now the address
+everywhere on the site, on a map on the contact page and on every page for work
+done at the shop, and 864 SW Piedmont Ct is gone.
+
+## Blocking the Flyra booking flow (for Jacob, not Chris)
+
+The booking flow is built and tested and is switched OFF, because two things
+are missing. Neither needs any code.
+
+A. **FLYRA_API_KEY in Vercel decrypts to an empty value.** It is listed on the
+   project for Production (added 2026-11-11) but `vercel env pull` returns
+   `FLYRA_API_KEY=""`, so the value never got saved. It is also absent from
+   Preview entirely, which means the preview deploy cannot book anything even
+   once the value is fixed. Add it again to **Production and Preview**.
+B. **The two tech ids are not in config.** `config.booking.techIds` is an empty
+   array. They come from `GET /employees` on the Flyra API for Evan Russo and
+   Schuyler Clawson, which could not be called without the key above. Paste the
+   two ids in and the flow turns itself on.
+
+Until both are done, every package card falls back to a quote CTA and the
+booking panel shows "we cannot load the calendar, call us" with the phone
+number. Nothing is broken and no lead is lost; online booking is simply not
+offered yet.
+
 ## Top of the list
 
-1. What is the shop address, and should it replace or sit beside
-   864 SW Piedmont Ct? Nothing on the site names a shop address until you give
-   one; it currently says "the shop in Port St. Lucie" and nothing more.
-2. Do you want booking calendars for paint protection film, paint correction
-   and window tinting, or quote requests only? They take quote requests today.
+1. **Window tint: do you still offer it, and at what price?** It is not in your
+   Flyra price book. The tint page is live and UNCHANGED at its old starting
+   price because you did not answer, which means the site may be advertising a
+   service you have stopped doing, at a price that may be wrong. If you have
+   stopped, say so and the page comes down with a redirect.
+2. **Years wording.** Pick one: "Detailing since 2011, Premium Detailing since
+   2017", or founded 2017 and nine years everywhere. The site still says 2011
+   and fifteen years in business because you did not pick, so the About page,
+   the homepage copy and the stats strip are all still on the old wording.
+3. **About page content.** A founder story in your own words, a photo of you or
+   the team or the shop, and the link to the WPTV clip. The page has a founder
+   section wired up that renders nothing until these exist. It is the thinnest
+   page on the site.
+4. **Meta pixel id and GA4 id**, if you want either. Neither is installed. The
+   Google Ads tag is live and working.
+5. **A follower count for Instagram or TikTok, with the date you read it**, or
+   confirm we leave it off. The "20K followers" line has been removed: it was
+   read on 19 October and a visitor can check it in one tap.
+6. **The Gold Package used to promise "our protection blend, at least
+   forty-five days".** Your new price book describes the protection as "wax or
+   spray sealant" at the Silver level, so that forty-five day claim has been
+   taken off the site rather than reconciled with it. If the blend is still a
+   real thing and still lasts that long, say so and it goes back.
+7. Do you want booking for paint protection film, paint correction and window
+   tinting, or quote requests only? They take quote requests today, and
+   ceramic coating now does too, because which of the three coating packages a
+   car needs is decided at the paint evaluation.
 
 ## Photos and brand
 
@@ -64,17 +111,27 @@ better or turns a placeholder into the real thing.
 
 20. To show a live Instagram feed and a live follower count, the account has to
     be connected through Behold or the Instagram Graph API. The six reels on the
-    site are pasted by hand and the "20K followers" figure was read on
-    19 October, so both go stale. Do you want the account connected?
+    site are still pasted by hand. The "20K followers" line has been REMOVED
+    (it was read on 19 October and nothing replaced it). Do you want the
+    account connected?
 21. Are the Facebook, Instagram and TikTok links on your old site still current?
     There is no Yelp link; do you have one?
 
 ## Technical
 
-22. Are you still using the LeadConnector booking calendars? The Bronze, Silver,
-    Gold and ceramic coating cards link to them.
-23. Should quote requests go to the website form, to those calendars, or both?
+22. ANSWERED and done: the LeadConnector calendars are gone. Booking now goes
+    into Flyra directly. There is no GoHighLevel link left on the site.
+23. Quote requests still go to the website form, which reaches the Align and
+    Acquire platform. Getting those into Flyra as leads is a change on the
+    platform side, not on this site.
 24. Do you want the Google Tag Manager container from your old site carried over?
+25. A live Instagram feed needs the account connected through Behold or the
+    Instagram Graph API. The config field is wired and empty
+    (`social.instagram.feedUrl`); the six reels on the page are pasted by hand.
+    TikTok needs nothing: that one is the creator embed and updates itself.
+26. Meta's Conversions API, which reports leads to Meta from our server rather
+    than the browser, needs an access token from your Meta account. Not built.
+    Worth doing only once the pixel is in.
 
 ## Before launch (for Jacob, not Chris)
 

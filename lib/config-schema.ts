@@ -66,14 +66,51 @@ const isoDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'must be YYYY-MM-DD')
  * of them became the site's headline trade. As tiers they are one card, one
  * page and one comparison table, and each keeps its own booking calendar.
  */
+/**
+ * What it takes to book one thing online, in the owner's CRM.
+ *
+ * `flyraService` must be the service name EXACTLY as it reads in his Flyra
+ * price book, because it is sent as the job's service and a mismatch files the
+ * job under a name his techs do not recognise. `durationMinutes` is the only
+ * place a package length lives: the slot lookup asks Flyra for windows that
+ * long, the booking route recomputes the end time from it, and the package
+ * cards and the "how long does it take" FAQ print it. A client-supplied end
+ * time is never trusted.
+ *
+ * null means this thing is not bookable online and gets a quote CTA instead.
+ * That is the right answer for anything priced per vehicle: sending somebody
+ * to a calendar for work nobody can price until they see it wastes their time.
+ */
+/**
+ * An extra that can be bought alongside a service, priced on its own.
+ *
+ * Add-ons hang off the SERVICE rather than the site, because "wheels coated,
+ * $200" means nothing next to a Bronze wash and "pet hair removal, $75" means
+ * nothing next to a ceramic coating. One list per service, rendered as a price
+ * table on that service's page and compactly on /book.
+ */
+const addOn = z.object({
+  name: z.string().min(3),
+  price: z.number().positive(),
+  /** One clause of detail, or null. Never a second price. */
+  note: z.string().min(4).nullable().default(null),
+})
+
+const flyraBooking = z.object({
+  flyraService: z.string().min(2),
+  durationMinutes: z.number().int().positive(),
+})
+
 const serviceTier = z.object({
   name: z.string().min(2),
   slug,
   priceFrom: z.number().nullable(),
   priceNote: z.string().nullable(),
+  /** Appended after the figure, e.g. "per sq ft". null prints the price alone. */
+  priceUnit: z.string().min(2).nullable().default(null),
   /** The bullet list rendered in the comparison column. */
   includes: z.array(z.string().min(4)).min(1),
-  bookingUrl: z.string().url().nullable(),
+  booking: flyraBooking.nullable().default(null),
   /** The id this tier's section carries, so /book can deep link to it. */
   anchor: z.string().regex(SLUG_REGEX, 'must be kebab-case'),
 })
@@ -154,12 +191,29 @@ export const siteConfigSchema = z
           /** Starting price in whole dollars. The ONLY source of a dollar figure on the site. */
           priceFrom: z.number().nullable(),
           priceNote: z.string().nullable(),
+          /** Appended after the figure, e.g. "per sq ft". null prints the price alone. */
+          priceUnit: z.string().min(2).nullable().default(null),
           /**
-           * External booking URL for this service, or null when it cannot be
-           * booked online. /book renders a "Book this package" button only for
-           * services that have one.
+           * Where the work happens. Drives the two paths in "How it works",
+           * whether the page shows the shop map and directions, and the line
+           * on each card that tells a visitor if they are driving to us.
+           *
+           *   mobile    we come to the customer
+           *   shop      the customer drops the vehicle at the shop
+           *   property  we work at the customer's property, not on a vehicle
+           *
+           * null renders no location line at all, which is right for anything
+           * quoted before the logistics are known.
            */
-          bookingUrl: z.string().url().nullable().default(null),
+          where: z.enum(['mobile', 'shop', 'property']).nullable().default(null),
+          /**
+           * Online booking for the service as a whole, or null for a quote.
+           * A service sold as a price ladder leaves this null and puts the
+           * booking on each tier instead.
+           */
+          booking: flyraBooking.nullable().default(null),
+          /** Extras sold with this service, each priced on its own. */
+          addOns: z.array(addOn).default([]),
           /**
            * Announced but not yet bookable. /book shows a muted "Coming soon"
            * pill and a quote CTA instead of a booking button, and the service
@@ -406,6 +460,18 @@ export const siteConfigSchema = z
           .strict()
           .default({}),
         ga4: z.string().regex(/^G-[A-Z0-9]{4,14}$/, 'must look like G-ABC123DEF4').optional(),
+        /**
+         * Meta pixel id, digits only. Set it and the base pixel loads on every
+         * page and a "Lead" event fires wherever the Google Ads form
+         * conversion already fires. Unset and not one byte of Meta script is
+         * shipped, which is the state this site is in until the owner sends
+         * the id.
+         *
+         * The Conversions API (server-side Meta events) is deliberately NOT
+         * here: it needs an access token, which is a secret and belongs in the
+         * environment, not in a file that ships to the browser.
+         */
+        metaPixelId: z.string().regex(/^\d{10,20}$/, 'digits only, as Meta writes it').optional(),
       })
       .strict()
       .superRefine((t, ctx) => {
@@ -517,9 +583,21 @@ export const siteConfigSchema = z
           .object({
             handle: z.string().min(2),
             url: z.string().url(),
-            /** As written, e.g. "20K". A hand-read figure, so it carries a date. */
-            followers: z.string().min(2),
-            followersAsOf: isoDate,
+            /**
+             * As written, e.g. "20K", with the date it was read. BOTH are
+             * null together: a follower count with no date is a number nobody
+             * can check, and this one was six months stale before it was
+             * pulled. The section renders no follower line when they are null.
+             */
+            followers: z.string().min(2).nullable().default(null),
+            followersAsOf: isoDate.nullable().default(null),
+            /**
+             * A live-feed JSON endpoint (Behold or similar). SCAFFOLD: the
+             * owner has to connect the Instagram account before one exists, so
+             * it is null and the section renders the hand-pasted permalinks
+             * below instead. Nothing fetches this until it is set.
+             */
+            feedUrl: z.string().url().nullable().default(null),
             /**
              * Official permalinks. Empty renders nothing at all; there is no
              * live feed, so a post only appears here once someone pastes it.
@@ -536,8 +614,20 @@ export const siteConfigSchema = z
           })
           .nullable()
           .default(null),
+        /**
+         * The TikTok profile embed. Handle and url only: TikTok's own embed
+         * script renders the posts, so there is nothing here to keep in sync
+         * with what he has actually posted.
+         */
+        tiktok: z
+          .object({
+            handle: z.string().min(2),
+            url: z.string().url(),
+          })
+          .nullable()
+          .default(null),
       })
-      .default({ instagram: null }),
+      .default({ instagram: null, tiktok: null }),
 
     /**
      * Before/after pairs for the drag slider. Empty means the section renders
@@ -564,8 +654,112 @@ export const siteConfigSchema = z
       )
       .default([]),
 
+    /**
+     * The founder section on the About page. SCAFFOLD, and null today.
+     *
+     * The owner was asked for a founder story, a photo and the link to the
+     * WPTV clip, and has not sent them. Rather than writing a founder story on
+     * his behalf, the section renders nothing at all until this is filled: an
+     * invented origin story on an About page is the kind of copy a real
+     * customer notices is not in his voice.
+     *
+     * `press` is for the WPTV appearance. A label with no URL renders nothing,
+     * because "as seen on" with nowhere to click is worth less than silence.
+     */
+    founder: z
+      .object({
+        name: z.string().min(2),
+        /** "Owner and detailing instructor", as he describes himself. */
+        role: z.string().min(2),
+        /** His own words. Two or three paragraphs, separated by blank lines. */
+        story: z.string().min(80),
+        /** Manifest filename, or null for a text-only section. */
+        image: z.string().nullable().default(null),
+        press: z
+          .object({
+            label: z.string().min(2),
+            url: z.string().url(),
+          })
+          .nullable()
+          .default(null),
+      })
+      .nullable()
+      .default(null),
+
     /** A published promotion, or null. Never invented. */
     offer: z.string().nullable().default(null),
+
+    /**
+     * Online booking into the owner's CRM. null turns the whole booking flow
+     * off and every package falls back to a quote CTA, which is the safe state:
+     * a booking form that cannot reach the CRM loses the job silently.
+     *
+     * `techIds` are Flyra employee ids, and they are the reason this can be
+     * empty while everything else is set. Website bookings are dispatched to
+     * the named techs, so with no ids there is nobody to check availability
+     * against and the slot route returns no windows rather than guessing. The
+     * page then shows its "call us" state, which is a worse experience than a
+     * calendar and a much better one than a booking nobody is assigned to.
+     */
+    booking: z
+      .object({
+        /** IANA zone. Every slot is shown and sent in this zone, never the visitor's. */
+        timezone: z.string().min(3),
+        /** Flyra's own minimum notice. Never offer a slot sooner than this. */
+        minNoticeHours: z.number().int().nonnegative(),
+        /** How far ahead the date strip runs. */
+        daysAhead: z.number().int().positive(),
+        /** Flyra employee ids from GET /employees. Empty disables the flow. */
+        techIds: z.array(z.string().min(1)).default([]),
+        /** Whether money is taken to hold the slot. */
+        depositRequired: z.boolean(),
+        /** The lines printed under the booking heading. One sentence each, all verifiable. */
+        notes: z.array(z.string().min(8)).default([]),
+      })
+      .nullable()
+      .default(null),
+
+    /**
+     * Standing offers, as opposed to `offer` above which is a single headline
+     * promotion. Each is null or empty until the owner actually runs it.
+     */
+    specials: z
+      .object({
+        /** Prepaid block of details. `saving` is printed, not computed, so it cannot drift. */
+        bundle: z
+          .object({
+            name: z.string().min(3),
+            price: z.number().positive(),
+            /** What one visit works out at inside the bundle. */
+            unitPrice: z.number().positive(),
+            visits: z.number().int().positive(),
+            saving: z.number().positive(),
+            detail: z.string().min(10),
+          })
+          .nullable()
+          .default(null),
+        /** Give this, get this, when the condition is met. */
+        referral: z
+          .object({
+            give: z.number().positive(),
+            get: z.number().positive(),
+            condition: z.string().min(8),
+          })
+          .nullable()
+          .default(null),
+        /** Recurring maintenance plans, billed per completed visit. */
+        plans: z
+          .array(
+            z.object({
+              name: z.string().min(3),
+              pricePerVisit: z.number().positive(),
+              visitsPerYear: z.number().int().positive(),
+              note: z.string().min(8).nullable().default(null),
+            }),
+          )
+          .default([]),
+      })
+      .default({ bundle: null, referral: null, plans: [] }),
 
     /** Full origin including https:// and www. when www is the primary host. No trailing slash. */
     domain: z
@@ -602,6 +796,10 @@ export type SiteConfigParsed = z.output<typeof siteConfigSchema>
 
 export type Service = SiteConfigParsed['services'][number]
 export type ServiceTier = Service['tiers'][number]
+export type FlyraBooking = NonNullable<Service['booking']>
+export type AddOn = Service['addOns'][number]
+export type Specials = SiteConfigParsed['specials']
+export type BookingSettings = NonNullable<SiteConfigParsed['booking']>
 export type ServiceArea = SiteConfigParsed['serviceAreas'][number]
 export type Review = SiteConfigParsed['reviews'][number]
 export type Faq = SiteConfigParsed['faqs'][number]
@@ -628,12 +826,43 @@ export type SiteConfig = SiteConfigParsed & {
 }
 
 /**
- * 3999 -> "3,999". The ONE place a price is turned into text, so a four digit
- * starting price reads as money everywhere it appears instead of "$3999".
+ * 3999 -> "3,999", 1.5 -> "1.50". The ONE place a price is turned into text, so
+ * a four digit starting price reads as money everywhere it appears instead of
+ * "$3999", and a per-unit rate reads as money instead of "$1.5".
  * Prices themselves still live only in site.config.ts, never in content.
  */
 export function formatPrice(amount: number): string {
-  return amount.toLocaleString('en-US')
+  const fractionDigits = Number.isInteger(amount) ? 0 : 2
+  return amount.toLocaleString('en-US', {
+    minimumFractionDigits: fractionDigits,
+    maximumFractionDigits: fractionDigits,
+  })
+}
+
+/**
+ * 45 -> "about 45 minutes", 60 -> "about an hour", 120 -> "about 2 hours".
+ *
+ * Derived from booking.durationMinutes, which is the same number the slot
+ * lookup asks Flyra for and the booking route recomputes the end time from, so
+ * what a visitor reads on the card is the length actually reserved. "about"
+ * is not hedging: it is the caveat the owner asked for, because a larger or
+ * very dirty vehicle takes longer.
+ */
+export function formatDuration(minutes: number): string {
+  if (minutes < 60) return `about ${minutes} minutes`
+  const hours = minutes / 60
+  if (hours === 1) return 'about an hour'
+  if (Number.isInteger(hours)) return `about ${hours} hours`
+  return `about ${hours.toFixed(1)} hours`
+}
+
+/**
+ * A price as it is printed everywhere: the figure, then its unit when it has
+ * one. One function so "$1.50 per sq ft" cannot become "$1.5/sqft" on the
+ * second surface that prints it.
+ */
+export function priceLabel(amount: number, unit: string | null = null): string {
+  return unit ? `$${formatPrice(amount)} ${unit}` : `$${formatPrice(amount)}`
 }
 
 /** "+15555550123" -> "(555) 555-0123". Authored nowhere; derived from config.phone. */

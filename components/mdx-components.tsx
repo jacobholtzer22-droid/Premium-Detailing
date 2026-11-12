@@ -9,6 +9,7 @@ import ServiceGrid from './ServiceGrid'
 import AreaList from './AreaList'
 import BeforeAfter from './BeforeAfter'
 import CoverageList from './CoverageList'
+import FounderNote from './FounderNote'
 import PhoneVideo from './PhoneVideo'
 import Testimonials from './Testimonials'
 
@@ -58,6 +59,7 @@ export const mdxComponents: MDXComponents = {
   AreaList,
   Credentials,
   BeforeAfter,
+  FounderNote,
   CoverageList,
   PhoneVideo,
   Testimonials,

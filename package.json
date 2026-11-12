@@ -6,9 +6,9 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "npx serve out",
+    "start": "next start",
     "images": "tsx scripts/process-images.ts",
-    "verify": "next build && tsx scripts/verify.ts",
+    "verify": "next build && tsx scripts/collect-out.ts && tsx scripts/verify.ts",
     "typecheck": "tsc --noEmit",
     "test": "tsx --test scripts/*.test.ts",
     "contrast": "tsx scripts/contrast-check.ts",
@@ -21,6 +21,7 @@
     "next-mdx-remote": "^6.0.0",
     "react": "18.3.1",
     "react-dom": "18.3.1",
+    "server-only": "0.0.1",
     "zod": "^3.23.8"
   },
   "devDependencies": {

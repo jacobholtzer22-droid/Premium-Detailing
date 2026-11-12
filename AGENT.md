@@ -5,7 +5,11 @@ Absolute rules
 1. Never invent a business fact. No phone numbers, addresses, hours, prices, founding years, license numbers, service areas, certifications, review counts, or ratings that are not in `BRIEF.md`. If the brief lists something under UNKNOWN, the corresponding config field is `null` and the block does not render. An empty slot is correct. A plausible guess is a defect.
 2. Never type a fact into content. Phone numbers, addresses, and prices go in `site.config.ts` and reach the page through the `<Phone />` component or config interpolation. Prose that hardcodes a fact will fail verification.
 3. Never write a JSON-LD block. Schema comes from `lib/schema.ts`. If a page needs schema you think is missing, say so in your final report. Do not hand-write it.
-4. Never edit `components/ContactForm.tsx`. It is checksum-verified.
+4. Never edit `components/ContactForm.tsx`. It is checksum-verified. Nothing
+   else on the site may use `role="status"` either: lib/track.ts watches
+   `main [role="status"]` to detect that form's thank-you and fire the lead
+   conversion, so a second element wearing that role counts a false lead. Use
+   `aria-live="polite"`, which is what the role means anyway.
 5. Never add Review or aggregateRating schema. It renders automatically from `config.reviews`, which you populate only from real reviews supplied in the brief with a source URL.
 6. `businessSlug` is a hardcoded string literal from the brief. Never an environment variable. If the brief does not contain it, stop and say so; it is the one thing you cannot proceed without.
 
@@ -89,6 +93,15 @@ Phase 5: Build, look at it, fix it
 5. Re-screenshot and confirm the fixes landed.
 
 Phase 6: Gate
+
+Note on this repo: it is NOT a static export. It needs server route handlers
+for the Flyra booking flow, and `output: 'export'` cannot host one without
+shipping the API key to the browser. Every page is still prerendered, so
+`npm run verify` runs `next build`, then `scripts/collect-out.ts` (which copies
+the finished HTML from `.next/server/app` back to `./out`), then the gate.
+`scripts/verify.ts` itself is unchanged and still reads real built HTML for
+every route. Do not point the gate anywhere else, and do not add a page that
+cannot be prerendered: collect-out fails the build if one appears.
 
 1. Run `npm run verify`.
 2. If it fails, fix and re-run. Maximum three attempts.
