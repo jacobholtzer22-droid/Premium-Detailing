@@ -41,6 +41,29 @@ function areaServed(areas: readonly ServiceArea[]): Json[] {
   return areas.map((a) => ({ '@type': 'City', name: a.name }))
 }
 
+/**
+ * "$150 - $5,999", from the cheapest and dearest starting prices in config.
+ *
+ * Derived rather than authored so it cannot contradict the prices on the page,
+ * and omitted entirely when nothing has a price. Per-unit rates are left out
+ * of the range: paver sealing at $1.50 per square foot is a real price but not
+ * a comparable one, and including it would tell Google this business starts at
+ * a dollar fifty.
+ */
+function priceRange(c: SiteConfig): Json {
+  const figures: number[] = []
+  for (const s of c.services) {
+    if (s.priceFrom !== null && s.priceUnit === null) figures.push(s.priceFrom)
+    for (const t of s.tiers) {
+      if (t.priceFrom !== null && t.priceUnit === null) figures.push(t.priceFrom)
+    }
+  }
+  if (figures.length === 0) return {}
+  const low = Math.min(...figures)
+  const high = Math.max(...figures)
+  return { priceRange: low === high ? `$${formatPrice(low)}` : `$${formatPrice(low)} - $${formatPrice(high)}` }
+}
+
 function aggregateRating(c: SiteConfig): Json {
   return whenNonEmpty(c.reviews, (reviews) => {
     const avg = reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
@@ -104,6 +127,7 @@ export function localBusiness(areas: readonly ServiceArea[] = config.serviceArea
       })),
     })),
     areaServed: areaServed(areas),
+    ...priceRange(c),
     ...whenNonEmpty(sameAs(c), (urls) => ({ sameAs: urls })),
     // foundingYear when it is known, because the yearsInBusiness fallback
     // moves the founding date forward every January.

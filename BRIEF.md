@@ -24,10 +24,22 @@ Anything not in this brief does not appear on the site. Facts are tagged [site] 
 
 - Phone: (772) 302-0717, E.164 `+17723020717` [gbp][site].
 - Email: premiumdetailingpsl@gmail.com [site].
-- Published address: 864 SW Piedmont Ct, Port St. Lucie, FL 34986 [gbp][site]. It is shown on both the GBP and the old site's footer, so it may be published here too. It looks like a residential street; UNRESOLVED whether the owner wants it on the new site. Put "864 SW Piedmont Ct" in address.street.
+- Published address: SUPERSEDED by [owner] 2026-11-08. The site now publishes
+  the shop at 2190 NW Reserve Park Trace, Suite 14, Port St. Lucie, FL 34986,
+  geocoded 2026-11-11 to 27.338537, -80.425346 by the US Census geocoder. The
+  864 SW Piedmont Ct address below is historical and appears nowhere on the
+  site.
+- Historical published address: 864 SW Piedmont Ct, Port St. Lucie, FL 34986 [gbp][site]. It is shown on both the GBP and the old site's footer, so it may be published here too. It looks like a residential street; UNRESOLVED whether the owner wants it on the new site. Put "864 SW Piedmont Ct" in address.street.
 - Lat/lng: 27.2964554, -80.3928873 [gbp].
-- Hours: the GBP shows "Open 24 hours" every day [gbp]. Mirror that in config so NAP matches Google, but display the hours line as "By appointment, seven days a week" wherever the template prints hours, and never write "24/7" or "24 hours" in prose. UNRESOLVED: real hours.
-- Booking: the old site books through LeadConnector (GoHighLevel) calendars [site], one per package:
+- Hours: SUPERSEDED by [owner] 2026-11-08 and his Flyra business hours: every
+  day 07:00 to 19:00, displayed as "Open 7 days, 7 AM to 7 PM, by appointment".
+  The structured data now matches the visible line. Historical: the GBP shows "Open 24 hours" every day [gbp]. Mirror that in config so NAP matches Google, but display the hours line as "By appointment, seven days a week" wherever the template prints hours, and never write "24/7" or "24 hours" in prose. UNRESOLVED: real hours.
+- Booking: SUPERSEDED 2026-11-11. GoHighLevel is gone. Booking now goes
+  directly into Flyra, the owner's CRM, through `lib/flyra.ts` and the two
+  route handlers under `app/api/booking/`. Only the Bronze, Silver and Gold
+  packages are bookable online; everything else is a quote. The calendar URLs
+  below are kept only as a record of what was replaced and must not be used.
+- Historical, the old site booked through LeadConnector (GoHighLevel) calendars [site], one per package:
   - Gold: https://api.leadconnectorhq.com/widget/booking/5EXJwsToTNOyza8OKOB0
   - Silver: https://api.leadconnectorhq.com/widget/booking/K4lPRLc5picjsYtGzs39
   - Bronze: https://api.leadconnectorhq.com/widget/booking/KfMx0UuW6ZhHpIRgeqLe

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { config } from '@/lib/config'
+import TikTokEmbed from './TikTokEmbed'
 
 /**
  * The Instagram section.
@@ -14,10 +15,18 @@ import { config } from '@/lib/config'
  * That matters because this is third-party script on a page whose whole job is
  * converting a visitor; it must never be what makes the page slow or blank.
  *
- * There is no live feed and no live follower count. Both need the owner to
- * connect the account through Behold or the Instagram Graph API, which is on
- * the client follow-up list. Until then the permalinks in config are pasted by
- * hand and the follower figure carries the date it was read.
+ * There is no live Instagram feed: that needs the owner to connect the account
+ * through Behold or the Instagram Graph API, and the config field it would read
+ * (social.instagram.feedUrl) is null until he does. Until then the permalinks in
+ * config are pasted by hand.
+ *
+ * The follower line renders only when a count AND the date it was read are
+ * both set. They are null now: "20K" was read by hand in October, was never
+ * going to stay true, and a follower count is the one number on a page like
+ * this that a visitor can check in a single tap.
+ *
+ * TikTok sits in the same section, through components/TikTokEmbed.tsx. That one
+ * is the creator embed, so it needs nothing kept current by hand.
  */
 const EMBED_SRC = 'https://www.instagram.com/embed.js'
 const FALLBACK_AFTER_MS = 5000
@@ -92,7 +101,10 @@ export default function InstagramFeed() {
     return () => window.clearInterval(timer)
   }, [armed, posts])
 
-  if (!ig || posts.length === 0) return null
+  const tiktok = config.social.tiktok
+
+  // The section earns its place if EITHER platform has something to show.
+  if ((!ig || posts.length === 0) && !tiktok) return null
 
   return (
     <section ref={sectionRef} className="border-t border-line bg-bg">
@@ -100,18 +112,34 @@ export default function InstagramFeed() {
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <h2 className="font-heading text-3xl font-bold text-primary-dark md:text-4xl">Follow the work</h2>
-            <p className="mt-2 text-base text-muted" title={`Read ${ig.followersAsOf}`}>
-              {ig.followers} followers on Instagram
-            </p>
+            {ig?.followers && ig.followersAsOf && (
+              <p className="mt-2 text-base text-muted" title={`Read ${ig.followersAsOf}`}>
+                {ig.followers} followers on Instagram
+              </p>
+            )}
           </div>
-          <a
-            href={ig.url}
-            rel="noopener noreferrer"
-            target="_blank"
-            className="btn inline-block rounded-site bg-accent px-6 py-3 text-sm font-semibold text-on-accent hover:bg-accent-dark"
-          >
-            Follow @{ig.handle}
-          </a>
+          <div className="flex flex-wrap gap-3">
+            {ig && (
+              <a
+                href={ig.url}
+                rel="noopener noreferrer"
+                target="_blank"
+                className="btn inline-flex min-h-[44px] items-center rounded-site bg-accent px-6 py-3 text-sm font-semibold text-on-accent hover:bg-accent-dark"
+              >
+                Follow @{ig.handle}
+              </a>
+            )}
+            {tiktok && (
+              <a
+                href={tiktok.url}
+                rel="noopener noreferrer"
+                target="_blank"
+                className="btn inline-flex min-h-[44px] items-center rounded-site border-2 border-primary-dark px-6 py-3 text-sm font-semibold text-primary-dark hover:bg-primary-dark hover:text-on-primary"
+              >
+                TikTok
+              </a>
+            )}
+          </div>
         </div>
 
         <ul className="no-scrollbar mt-10 flex snap-x snap-mandatory gap-5 overflow-x-auto pb-2 md:grid md:grid-cols-2 md:overflow-visible lg:grid-cols-3">
@@ -155,6 +183,15 @@ export default function InstagramFeed() {
             </li>
           ))}
         </ul>
+
+        {tiktok && (
+          <div className="mt-12 border-t border-line pt-10">
+            <h3 className="font-heading text-xl font-bold text-primary-dark">Latest on TikTok</h3>
+            <div className="mt-6 max-w-[780px]">
+              <TikTokEmbed handle={tiktok.handle} url={tiktok.url} />
+            </div>
+          </div>
+        )}
       </div>
     </section>
   )
