@@ -13,6 +13,7 @@ import RatingBar from '@/components/RatingBar'
 import Reveal from '@/components/Reveal'
 import Reviews from '@/components/Reviews'
 import ServiceGrid from '@/components/ServiceGrid'
+import Specials from '@/components/Specials'
 import Stats from '@/components/Stats'
 import Testimonials from '@/components/Testimonials'
 import WhyUs from '@/components/WhyUs'
@@ -65,6 +66,7 @@ export default async function HomePage() {
       <BeforeAfter />
       <WhyUs />
       <HowItWorks />
+      <Specials />
       <Gallery limit={12} moreHref="/gallery" />
       <InstagramFeed />
       <Reviews />
