@@ -75,6 +75,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           else: no tracking, no network, no globals.
         */}
         <script dangerouslySetInnerHTML={{ __html: "document.documentElement.classList.add('js')" }} />
+        <script defer src="https://www.alignandacquire.com/t/s/premium-detailing.js"></script>
       </head>
       <body className="flex min-h-screen flex-col pb-16 md:pb-0">
         <a

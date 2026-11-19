@@ -126,6 +126,9 @@ export default function Footer() {
             <Link href="/privacy-policy" className="hover:underline">
               Privacy Policy
             </Link>
+            <a href="#" data-aa-cookie-settings hidden className="hover:underline">
+              Cookie settings
+            </a>
             <a href="https://www.alignandacquire.com" rel="noopener" target="_blank" className="hover:underline">
               Site by Align and Acquire
             </a>
